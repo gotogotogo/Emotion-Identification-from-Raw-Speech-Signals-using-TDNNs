@@ -19,6 +19,7 @@ from sklearn.metrics import accuracy_score
 from utils.utils_wav import speech_collate
 import torch.nn.functional as F
 torch.multiprocessing.set_sharing_strategy('file_system')
+from tqdm import tqdm
 import warnings
 warnings.filterwarnings('ignore')
 
@@ -50,12 +51,13 @@ loss_fun = nn.CrossEntropyLoss()
 
 
 
-def train(dataloader_train,epoch):
+def train(train_loader,epoch):
     train_loss_list=[]
     full_preds=[]
     full_gts=[]
     model.train()
-    for index, sample_batched in enumerate(dataloader_train):
+    train_loader = tqdm(train_loader)
+    for step, sample_batched in enumerate(train_loader):
         
         features = torch.from_numpy(np.asarray([torch_tensor.numpy() for torch_tensor in sample_batched[0]])).float()
         labels = torch.from_numpy(np.asarray([torch_tensor[0].numpy() for torch_tensor in sample_batched[1]]))
@@ -69,8 +71,8 @@ def train(dataloader_train,epoch):
         optimizer.step()
         train_loss_list.append(loss.item())
         #train_acc_list.append(accuracy)
-        if index % 10 == 0:
-            print('Loss {} after {} iteration'.format(np.mean(np.asarray(train_loss_list)), index))
+        if step % 10 == 0:
+            train_loader.desc = "[epoch {} step {}] mean loss {}".format(epoch, step, np.mean(np.asarray(train_loss_list)))
         
         predictions = np.argmax(pred_logits.detach().cpu().numpy(),axis=1)
         for pred in predictions:
@@ -80,17 +82,17 @@ def train(dataloader_train,epoch):
             
     mean_acc = accuracy_score(full_gts,full_preds)
     mean_loss = np.mean(np.asarray(train_loss_list))
-    print('Total training loss {} and training Accuracy {} after {} epochs'.format(mean_loss,mean_acc,epoch))
+    print('[epoch {}] train loss {} train accuracy {}'.format(epoch, mean_loss, mean_acc))
     
 
 
-def test(dataloader_test,epoch):
+def test(test_loader,epoch):
     model.eval()
     with torch.no_grad():
         val_loss_list=[]
         full_preds=[]
         full_gts=[]
-        for i_batch, sample_batched in enumerate(dataloader_test):
+        for i_batch, sample_batched in enumerate(test_loader):
             features = torch.from_numpy(np.asarray([torch_tensor.numpy() for torch_tensor in sample_batched[0]])).float()
             labels = torch.from_numpy(np.asarray([torch_tensor[0].numpy() for torch_tensor in sample_batched[1]]))
             features, labels = features.to(device),labels.to(device)
@@ -107,7 +109,7 @@ def test(dataloader_test,epoch):
                 
         mean_acc = accuracy_score(full_gts,full_preds)
         mean_loss = np.mean(np.asarray(val_loss_list))
-        print('Total Test loss {} and Test accuracy {} after {} epochs'.format(mean_loss,mean_acc,epoch))
+        print('[epoch {}] test loss {} test accuracy {}\n'.format(epoch, mean_loss, mean_acc))
         
         model_save_path = os.path.join('save_model', 'best_check_point_'+str(epoch)+'_'+str(mean_acc))
         state_dict = {'model': model.state_dict(),'optimizer': optimizer.state_dict(),'epoch': epoch}
