@@ -115,6 +115,7 @@ def test(test_loader,epoch, best_acc):
             model_save_path = os.path.join('save_model', 'best_'+str(epoch)+'_'+str(round(mean_acc, 5)))
             state_dict = {'model': model.state_dict(),'optimizer': optimizer.state_dict(),'epoch': epoch}
             torch.save(state_dict, model_save_path)
+            print('-' * 20, 'best model in epoch {} '.format(epoch), '-' * 20)
     return best_acc
     
 if __name__ == '__main__':
