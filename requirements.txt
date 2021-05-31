@@ -1,5 +1,0 @@
-pytorch
-numpy
-glob
-sklearn
-librosa

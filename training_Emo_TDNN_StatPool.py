@@ -6,15 +6,12 @@ Created on Sat May 30 20:22:26 2020
 @author: krishna
 """
 
-
-
 import torch
 import numpy as np
 from torch.utils.data import DataLoader   
-from SpeechDataGenerator import SpeechDataGenerator
+from dataset import CustomDataset
 import torch.nn as nn
 import os
-import numpy as np
 from torch import optim
 import argparse
 from models.Emo_Raw_TDNN_StatPool import Emo_Raw_TDNN
@@ -22,12 +19,12 @@ from sklearn.metrics import accuracy_score
 from utils.utils_wav import speech_collate
 import torch.nn.functional as F
 torch.multiprocessing.set_sharing_strategy('file_system')
-
+import warnings
+warnings.filterwarnings('ignore')
 
 ########## Argument parser
 parser = argparse.ArgumentParser(add_help=False)
-parser.add_argument('-training_filepath',type=str,default='meta/training_s2_s3_s4_s5.txt')
-parser.add_argument('-testing_filepath',type=str, default='meta/testing_s1.txt')
+parser.add_argument('--wav_files_collect_path', type=str, default='wav_collect_files.pkl')
 
 parser.add_argument('-input_dim', action="store_true", default=1)
 parser.add_argument('-num_classes', action="store_true", default=4)
@@ -38,11 +35,11 @@ parser.add_argument('-num_epochs', action="store_true", default=1000)
 args = parser.parse_args()
 
 ### Data related
-dataset_train = SpeechDataGenerator(manifest=args.training_filepath,mode='train')
-dataloader_train = DataLoader(dataset_train, batch_size=args.batch_size,shuffle=True,collate_fn=speech_collate) 
+dataset_train = CustomDataset(args.wav_files_collect_path, mode='train', test_sess=5)
+dataloader_train = DataLoader(dataset_train, batch_size=args.batch_size, shuffle=True, collate_fn=speech_collate) 
 
-dataset_test = SpeechDataGenerator(manifest=args.testing_filepath,mode='test')
-dataloader_test = DataLoader(dataset_test, batch_size=args.batch_size,shuffle=True,collate_fn=speech_collate) 
+dataset_test = CustomDataset(args.wav_files_collect_path, mode='test', test_sess=5)
+dataloader_test = DataLoader(dataset_test, batch_size=args.batch_size, shuffle=True, collate_fn=speech_collate) 
 
 ## Model related
 use_cuda = torch.cuda.is_available()
