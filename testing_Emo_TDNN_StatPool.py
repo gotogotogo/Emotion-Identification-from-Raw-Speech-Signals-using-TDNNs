@@ -11,7 +11,6 @@ Created on Sat May 30 20:22:26 2020
 import torch
 import numpy as np
 from torch.utils.data import DataLoader   
-from SpeechDataGenerator import SpeechDataGenerator
 import torch.nn as nn
 import os
 import numpy as np

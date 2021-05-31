@@ -86,7 +86,7 @@ def train(train_loader,epoch):
     
 
 
-def test(test_loader,epoch):
+def test(test_loader,epoch, best_acc):
     model.eval()
     with torch.no_grad():
         val_loss_list=[]
@@ -110,17 +110,20 @@ def test(test_loader,epoch):
         mean_acc = accuracy_score(full_gts,full_preds)
         mean_loss = np.mean(np.asarray(val_loss_list))
         print('[epoch {}] test loss {} test accuracy {}\n'.format(epoch, mean_loss, mean_acc))
-        
-        model_save_path = os.path.join('save_model', 'best_check_point_'+str(epoch)+'_'+str(mean_acc))
-        state_dict = {'model': model.state_dict(),'optimizer': optimizer.state_dict(),'epoch': epoch}
-        torch.save(state_dict, model_save_path)
+        if mean_acc > best_acc:
+            best_acc = mean_acc
+            model_save_path = os.path.join('save_model', 'best_'+str(epoch)+'_'+str(round(mean_acc, 5)))
+            state_dict = {'model': model.state_dict(),'optimizer': optimizer.state_dict(),'epoch': epoch}
+            torch.save(state_dict, model_save_path)
+    return best_acc
     
 if __name__ == '__main__':
     if not os.path.isdir('save_model'):
         os.makedirs('save_model')
+    best_acc = 0.0
     for epoch in range(args.num_epochs):
         train(dataloader_train,epoch)
-        test(dataloader_test,epoch)
+        best_acc = test(dataloader_test,epoch, best_acc)
         
     
     
