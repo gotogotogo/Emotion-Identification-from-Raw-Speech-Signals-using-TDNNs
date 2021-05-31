@@ -55,7 +55,7 @@ def train(dataloader_train,epoch):
     full_preds=[]
     full_gts=[]
     model.train()
-    for i_batch, sample_batched in enumerate(dataloader_train):
+    for index, sample_batched in enumerate(dataloader_train):
         
         features = torch.from_numpy(np.asarray([torch_tensor.numpy() for torch_tensor in sample_batched[0]])).float()
         labels = torch.from_numpy(np.asarray([torch_tensor[0].numpy() for torch_tensor in sample_batched[1]]))
@@ -69,8 +69,8 @@ def train(dataloader_train,epoch):
         optimizer.step()
         train_loss_list.append(loss.item())
         #train_acc_list.append(accuracy)
-        if i_batch%10==0:
-            print('Loss {} after {} iteration'.format(np.mean(np.asarray(train_loss_list)),i_batch))
+        if index % 10 == 0:
+            print('Loss {} after {} iteration'.format(np.mean(np.asarray(train_loss_list)), index))
         
         predictions = np.argmax(pred_logits.detach().cpu().numpy(),axis=1)
         for pred in predictions:
@@ -114,6 +114,8 @@ def test(dataloader_test,epoch):
         torch.save(state_dict, model_save_path)
     
 if __name__ == '__main__':
+    if not os.path.isdir('save_model'):
+        os.makedirs('save_model')
     for epoch in range(args.num_epochs):
         train(dataloader_train,epoch)
         test(dataloader_test,epoch)
