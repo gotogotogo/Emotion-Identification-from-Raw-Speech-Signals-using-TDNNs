@@ -7,6 +7,8 @@ import pickle
 import argparse
 from tqdm import tqdm
 
+parser = argparse.ArgumentParser(add_help=False)
+parser.add_argument('--raw_path', type=str, default='F:/IEMOCAP')
 emotion_id = {'hap': 0, 'exc': 0, 'ang': 1, 'sad': 2, 'neu': 3}
 gender_id = {'M':0,'F':1}
 def collect_files(root_path):
@@ -45,4 +47,5 @@ def collect_files(root_path):
 
 
 if __name__ == "__main__":
-    collect_files('F:/IEMOCAP')
+    args = parser.parse_args()
+    collect_files(args.raw_path)
