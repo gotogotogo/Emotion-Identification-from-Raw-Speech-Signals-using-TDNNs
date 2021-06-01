@@ -59,7 +59,8 @@ def train(train_loader,epoch):
     train_loader = tqdm(train_loader)
     for step, (features, labels) in enumerate(train_loader):
         #print(features.shape)
-        features = features.float()
+        features = torch.tensor(features).float()
+        labels = torch.tensor(labels)
         #print(labels.shape)
         features, labels = features.to(device),labels.to(device)
         features.requires_grad = True
