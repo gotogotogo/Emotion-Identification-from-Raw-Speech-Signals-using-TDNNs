@@ -60,7 +60,11 @@ def train(train_loader,epoch):
     for step, sample_batched in enumerate(train_loader):
         
         features = torch.from_numpy(np.asarray([torch_tensor.numpy() for torch_tensor in sample_batched[0]])).float()
+        print(sample_batched[0].shape)
+        print(features.shpae)
         labels = torch.from_numpy(np.asarray([torch_tensor[0].numpy() for torch_tensor in sample_batched[1]]))
+        print(sample_batched[1].shape)
+        print(labels.shape)
         features, labels = features.to(device),labels.to(device)
         features.requires_grad = True
         optimizer.zero_grad()
