@@ -37,10 +37,10 @@ args = parser.parse_args()
 
 ### Data related
 dataset_train = CustomDataset(args.wav_files_collect_path, mode='train', test_sess=5)
-dataloader_train = DataLoader(dataset_train, batch_size=args.batch_size, shuffle=True)  
+dataloader_train = DataLoader(dataset_train, batch_size=args.batch_size, shuffle=True, drop_last=True, collate_fn=speech_collate)  
 
 dataset_test = CustomDataset(args.wav_files_collect_path, mode='test', test_sess=5)
-dataloader_test = DataLoader(dataset_test, batch_size=args.batch_size, shuffle=True)  
+dataloader_test = DataLoader(dataset_test, batch_size=args.batch_size, shuffle=True, drop_last=True, collate_fn=speech_collate)  
 
 ## Model related
 use_cuda = torch.cuda.is_available()

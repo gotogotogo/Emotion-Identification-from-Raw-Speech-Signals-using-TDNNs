@@ -40,4 +40,4 @@ class CustomDataset(Dataset):
         #gender = self.gender_labels[index]
         extend_wav = utils_wav.load_wav(wav_path,min_dur_sec=10)
         sample = {'raw_speech': torch.from_numpy(np.ascontiguousarray(extend_wav)), 'labels': torch.from_numpy(np.ascontiguousarray(label))}
-        return extend_wav, label
+        return sample
