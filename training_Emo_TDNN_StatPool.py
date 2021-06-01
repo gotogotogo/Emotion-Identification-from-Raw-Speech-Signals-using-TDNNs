@@ -37,16 +37,16 @@ args = parser.parse_args()
 
 ### Data related
 dataset_train = CustomDataset(args.wav_files_collect_path, mode='train', test_sess=5)
-#dataloader_train = DataLoader(dataset_train, batch_size=args.batch_size, shuffle=True, collate_fn=speech_collate) 
 dataloader_train = DataLoader(dataset_train, batch_size=args.batch_size, shuffle=True)  
+
 dataset_test = CustomDataset(args.wav_files_collect_path, mode='test', test_sess=5)
-#dataloader_test = DataLoader(dataset_test, batch_size=args.batch_size, shuffle=True, collate_fn=speech_collate) 
 dataloader_test = DataLoader(dataset_test, batch_size=args.batch_size, shuffle=True)  
+
 ## Model related
 use_cuda = torch.cuda.is_available()
 device = torch.device("cuda" if use_cuda else "cpu")
 model = Emo_Raw_TDNN(args.num_classes).to(device)
-optimizer = optim.Adam(model.parameters(), lr=0.0001, weight_decay=0.0, betas=(0.9, 0.98), eps=1e-9)
+optimizer = optim.Adam(model.parameters(), lr=0.0001, weight_decay=0.000001, betas=(0.9, 0.98), eps=1e-9)
 loss_fun = nn.CrossEntropyLoss()
 
 
@@ -58,14 +58,9 @@ def train(train_loader,epoch):
     model.train()
     train_loader = tqdm(train_loader)
     for step, (features, labels) in enumerate(train_loader):
-        
-        # features = torch.from_numpy(np.asarray([torch_tensor.numpy() for torch_tensor in sample_batched[0]])).float()
-        # print(sample_batched[0].shape)
-        print(features.shape)
+        #print(features.shape)
         features = features.float()
-        # labels = torch.from_numpy(np.asarray([torch_tensor[0].numpy() for torch_tensor in sample_batched[1]]))
-        # print(sample_batched[1].shape)
-        print(labels.shape)
+        #print(labels.shape)
         features, labels = features.to(device),labels.to(device)
         features.requires_grad = True
         optimizer.zero_grad()
