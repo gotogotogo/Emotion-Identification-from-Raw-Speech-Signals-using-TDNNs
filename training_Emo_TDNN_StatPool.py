@@ -62,6 +62,7 @@ def train(train_loader,epoch):
         # features = torch.from_numpy(np.asarray([torch_tensor.numpy() for torch_tensor in sample_batched[0]])).float()
         # print(sample_batched[0].shape)
         print(features.shape)
+        features = features.float()
         # labels = torch.from_numpy(np.asarray([torch_tensor[0].numpy() for torch_tensor in sample_batched[1]]))
         # print(sample_batched[1].shape)
         print(labels.shape)
