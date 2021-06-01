@@ -28,7 +28,8 @@ class CNN_frontend(nn.Module):
         # N x 1 x 160000
         out = self.conv1(raw_input)
         # N x 256 x 1000
-        out = F.relu(torch.log(torch.abs(out)))
+        #out = F.relu(torch.log(torch.abs(out)))
+        out = F.relu(out) 
         out = self.bn1(out)
         out = self.nin1(out)
         # N x 128 x 500
