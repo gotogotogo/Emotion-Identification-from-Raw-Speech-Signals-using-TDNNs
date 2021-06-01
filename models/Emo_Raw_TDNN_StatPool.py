@@ -17,7 +17,7 @@ class CNN_frontend(nn.Module):
         super(CNN_frontend, self).__init__()
         # self.conv1 = nn.Conv1d(input_channel, 64, kernel_size=7, stride=4, padding=3,
         #                        bias=False)
-        self.conv1 = nn.Con1d(1, 256, kernel_size=400, stride=160, padding=199, bias=False)
+        self.conv1 = nn.Conv1d(1, 256, kernel_size=400, stride=160, padding=199, bias=False)
         self.bn1 = nn.BatchNorm1d(256)
         self.nin1 = NIN(256, 128)
 
