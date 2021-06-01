@@ -57,13 +57,13 @@ def train(train_loader,epoch):
     full_gts=[]
     model.train()
     train_loader = tqdm(train_loader)
-    for step, sample_batched in enumerate(train_loader):
+    for step, (features, labels) in enumerate(train_loader):
         
-        features = torch.from_numpy(np.asarray([torch_tensor.numpy() for torch_tensor in sample_batched[0]])).float()
-        print(sample_batched[0].shape)
+        # features = torch.from_numpy(np.asarray([torch_tensor.numpy() for torch_tensor in sample_batched[0]])).float()
+        # print(sample_batched[0].shape)
         print(features.shape)
-        labels = torch.from_numpy(np.asarray([torch_tensor[0].numpy() for torch_tensor in sample_batched[1]]))
-        print(sample_batched[1].shape)
+        # labels = torch.from_numpy(np.asarray([torch_tensor[0].numpy() for torch_tensor in sample_batched[1]]))
+        # print(sample_batched[1].shape)
         print(labels.shape)
         features, labels = features.to(device),labels.to(device)
         features.requires_grad = True
