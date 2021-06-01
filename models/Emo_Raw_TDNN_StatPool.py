@@ -28,7 +28,7 @@ class CNN_frontend(nn.Module):
         # N x 1 x 160000
         out = self.conv1(raw_input)
         # N x 256 x 1000
-        out = torch.log(torch.abs(out))
+        out = F.relu(torch.log(torch.abs(out)))
         out = self.bn1(out)
         out = self.nin1(out)
         # N x 128 x 500
@@ -46,7 +46,6 @@ class NIN(nn.Module):
         N, channels, time_steps = x.shape[0], x.shape[1], x.shape[2]
         x = x.permute(0, 2, 1).contiguous()
         x = x.reshape(N, time_steps // 2, channels * 2)
-        x = F.relu(x)
         x = F.relu(self.fc1(x))
         x = F.relu(self.fc2(x))
         x = x.permute(0, 2, 1).contiguous()
@@ -79,6 +78,7 @@ class Emo_Raw_TDNN(nn.Module):
     def forward(self, inputs):
         cnn_out = self.cnn_frontend(inputs)
         #print('frontend output shape:', cnn_out.shape) 
+        print('frontend output', cnn_out)
         cnn_out = cnn_out.permute(0,2,1)
         tdnn1_out = self.tdnn1(cnn_out)
         lstm1_out, (final_hidden_state, final_cell_state) = self.lstm1(tdnn1_out)
