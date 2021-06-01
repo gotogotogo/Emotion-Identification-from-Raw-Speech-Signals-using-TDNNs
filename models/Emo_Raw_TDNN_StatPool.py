@@ -78,7 +78,7 @@ class Emo_Raw_TDNN(nn.Module):
         
     def forward(self, inputs):
         cnn_out = self.cnn_frontend(inputs)
-        print('frontend output shape:', cnn_out.shape) 
+        #print('frontend output shape:', cnn_out.shape) 
         cnn_out = cnn_out.permute(0,2,1)
         tdnn1_out = self.tdnn1(cnn_out)
         lstm1_out, (final_hidden_state, final_cell_state) = self.lstm1(tdnn1_out)
@@ -93,7 +93,7 @@ class Emo_Raw_TDNN(nn.Module):
         mean = torch.mean(lstm3_out,1)
         std = torch.var(lstm3_out,1)
         stat_pooling = torch.cat((mean,std),1)
-        print('stat pooling shape:', stat_pooling.shape)
+        #print('stat pooling shape:', stat_pooling.shape)
         emo_predictions= self.fc(stat_pooling)
         return emo_predictions
     
