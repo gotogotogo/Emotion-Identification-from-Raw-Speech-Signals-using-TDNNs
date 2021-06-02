@@ -15,42 +15,54 @@ import torch.nn.functional as F
 class CNN_frontend(nn.Module):
     def __init__(self):
         super(CNN_frontend, self).__init__()
-        # self.conv1 = nn.Conv1d(input_channel, 64, kernel_size=7, stride=4, padding=3,
-        #                        bias=False)
-        self.conv1 = nn.Conv1d(1, 256, kernel_size=400, stride=160, padding=199, bias=False)
-        self.bn1 = nn.BatchNorm1d(256)
-        self.nin1 = NIN(256, 128)
+        self.nin1 = NIN(1, 64, kernel_size=7, stride=4, padding=3, bias=False)
+        self.bn1 = nn.BatchNorm1d(64)
+        self.maxpool1 = nn.MaxPool1d(kernel_size=4, stride=2, padding=1)
 
-        self.nin2 = NIN(128, 128)
+        self.nin2 = NIN(64, 128, kernel_size=7, stride=4, padding=3, bias=False)
         self.bn2 = nn.BatchNorm1d(128)
-        
-    def forward(self, raw_input):
+        self.maxpool2 = nn.MaxPool1d(kernel_size=4, stride=2)
+
+        self.nin3 = nn.Conv1d(128, 128, kernel_size=7, stride=4)
+        self.bn3 = nn.BatchNorm1d(128)
+        self.maxpool3 = nn.MaxPool1d(kernel_size=4, stride=2)
+
+
+    def forward(self, x):
         # N x 1 x 160000
-        out = self.conv1(raw_input)
-        # N x 256 x 1000
-        #out = F.relu(torch.log(torch.abs(out)))
-        out = F.relu(out) 
-        out = self.bn1(out)
-        out = self.nin1(out)
-        # N x 128 x 500
+        out = self.nin1(x)
+        print('1-1 ', out.shape)
+        out = F.relu(self.bn1(out))
+        out = self.maxpool1(out)
+        print('1-2 ', out.shape) 
+
         out = self.nin2(out)
-        out = self.bn2(out)
-        # N x 128 x 250
+        print('2-1 ', out.shape)
+        out = F.relu(self.bn2(out))
+        out = self.maxpool2(out)
+        print('2-2 ', out.shape)
+
+        out = self.nin3(out)
+        print('3-1 ', out.shape)
+        out = F.relu(self.bn3(out))
+        out = self.maxpool3(out)
+        print('3-2 ', out.shape)
         return out
 
 class NIN(nn.Module):
-    def __init__(self, inchannel, outchannel):
+    def __init__(self, in_channels, out_channels, kernel_size, stride, padding, bias):
         super(NIN, self).__init__()
-        self.fc1 = nn.Linear(inchannel * 2, inchannel * 4, bias=False)
-        self.fc2 = nn.Linear(inchannel * 4, outchannel, bias=False)
+        self.blk = nn.Sequential(
+            nn.Conv1d(in_channels, out_channels, kernel_size=kernel_size, stride=stride, padding=padding, bias=bias),
+            nn.ReLU(),
+            nn.Conv1d(out_channels, out_channels, kernel_size=1, bias=False),
+            nn.ReLU(), 
+            nn.Conv1d(out_channels, out_channels, kernel_size=1, bias=False),
+            nn.ReLU(),
+        )
+        
     def forward(self, x):
-        N, channels, time_steps = x.shape[0], x.shape[1], x.shape[2]
-        x = x.permute(0, 2, 1).contiguous()
-        x = x.reshape(N, time_steps // 2, channels * 2)
-        x = F.relu(self.fc1(x))
-        x = F.relu(self.fc2(x))
-        x = x.permute(0, 2, 1).contiguous()
-        return x
+        return self.blk(x)
 
 class Emo_Raw_TDNN(nn.Module):
     def __init__(self, num_classes=4):
