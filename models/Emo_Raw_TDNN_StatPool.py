@@ -31,22 +31,23 @@ class CNN_frontend(nn.Module):
     def forward(self, x):
         # N x 1 x 160000
         out = self.nin1(x)
-        print('1-1 ', out.shape)
+        #print('1-1 ', out.shape)
         out = F.relu(self.bn1(out))
         out = self.maxpool1(out)
-        print('1-2 ', out.shape) 
+        #print('1-2 ', out.shape) 
 
         out = self.nin2(out)
-        print('2-1 ', out.shape)
+        #print('2-1 ', out.shape)
         out = F.relu(self.bn2(out))
         out = self.maxpool2(out)
-        print('2-2 ', out.shape)
+        #print('2-2 ', out.shape)
 
         out = self.nin3(out)
-        print('3-1 ', out.shape)
+        #print('3-1 ', out.shape)
         out = F.relu(self.bn3(out))
         out = self.maxpool3(out)
-        print('3-2 ', out.shape)
+        #print('3-2 ', out.shape)
+        # N x 128 x 311
         return out
 
 class NIN(nn.Module):
