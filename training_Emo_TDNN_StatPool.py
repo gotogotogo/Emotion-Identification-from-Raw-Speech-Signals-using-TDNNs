@@ -15,7 +15,7 @@ import os
 from torch import optim
 import argparse
 from models.Emo_Raw_TDNN_StatPool import Emo_Raw_TDNN
-from sklearn.metrics import accuracy_score
+from sklearn.metrics import balanced_accuracy_score
 from utils.utils_wav import speech_collate
 import torch.nn.functional as F
 torch.multiprocessing.set_sharing_strategy('file_system')
@@ -82,9 +82,9 @@ def train(train_loader,epoch):
         for lab in labels.detach().cpu().numpy():
             full_gts.append(lab)
             
-    mean_acc = accuracy_score(full_gts,full_preds)
+    unweighted_avg_recall = balanced_accuracy_score(full_gts,full_preds)
     mean_loss = np.mean(np.asarray(train_loss_list))
-    print('[epoch {}] train loss {} train accuracy {}'.format(epoch, mean_loss, mean_acc))
+    print('[epoch {}] train loss {} train unweighted average recall {}'.format(epoch, mean_loss, unweighted_avg_recall))
     
 
 
@@ -109,12 +109,12 @@ def test(test_loader,epoch, best_acc):
             for lab in labels.detach().cpu().numpy():
                 full_gts.append(lab)
                 
-        mean_acc = accuracy_score(full_gts,full_preds)
+        unweighted_avg_recall = balanced_accuracy_score(full_gts,full_preds)
         mean_loss = np.mean(np.asarray(val_loss_list))
-        print('[epoch {}] test loss {} test accuracy {}\n'.format(epoch, mean_loss, mean_acc))
-        if mean_acc > best_acc:
-            best_acc = mean_acc
-            model_save_path = os.path.join('save_model', 'best_'+str(epoch)+'_'+str(round(mean_acc, 5)))
+        print('[epoch {}] test loss {} test unweighted average recall {}\n'.format(epoch, mean_loss, unweighted_avg_recall))
+        if unweighted_avg_recall > best_acc:
+            best_acc = unweighted_avg_recall
+            model_save_path = os.path.join('save_model', 'best_'+str(epoch)+'_'+str(round(unweighted_avg_recall, 5)))
             state_dict = {'model': model.state_dict(),'optimizer': optimizer.state_dict(),'epoch': epoch}
             torch.save(state_dict, model_save_path)
             print('-' * 20, 'best model in epoch {} '.format(epoch), '-' * 20)
