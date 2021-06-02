@@ -116,7 +116,7 @@ def test(test_loader,epoch, best_acc, target_names):
             print('-' * 20, 'best model in epoch {} '.format(epoch), '-' * 20) 
             best_acc = unweighted_avg_recall
             print(classification_report(full_gts, full_preds, target_names=target_names))
-            print('confusion matrix: ', confusion_matrix(full_gts, full_preds))
+            print(confusion_matrix(full_gts, full_preds))
             model_save_path = os.path.join('save_model', 'best_'+str(epoch)+'_'+str(round(unweighted_avg_recall, 5)))
             state_dict = {'model': model.state_dict(),'optimizer': optimizer.state_dict(),'epoch': epoch}
             torch.save(state_dict, model_save_path)
