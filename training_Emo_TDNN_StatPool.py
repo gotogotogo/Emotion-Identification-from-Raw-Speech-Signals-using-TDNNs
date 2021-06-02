@@ -15,7 +15,7 @@ import os
 from torch import optim
 import argparse
 from models.Emo_Raw_TDNN_StatPool import Emo_Raw_TDNN
-from sklearn.metrics import balanced_accuracy_score
+from sklearn.metrics import balanced_accuracy_score, classification_report
 from utils.utils_wav import speech_collate
 import torch.nn.functional as F
 torch.multiprocessing.set_sharing_strategy('file_system')
@@ -88,7 +88,7 @@ def train(train_loader,epoch):
     
 
 
-def test(test_loader,epoch, best_acc):
+def test(test_loader,epoch, best_acc, target_names):
     model.eval()
     with torch.no_grad():
         val_loss_list=[]
@@ -114,6 +114,7 @@ def test(test_loader,epoch, best_acc):
         print('[epoch {}] test loss {} test unweighted average recall {}\n'.format(epoch, mean_loss, unweighted_avg_recall))
         if unweighted_avg_recall > best_acc:
             best_acc = unweighted_avg_recall
+            print(classification_report(full_gts, full_preds, target_names=target_names))
             model_save_path = os.path.join('save_model', 'best_'+str(epoch)+'_'+str(round(unweighted_avg_recall, 5)))
             state_dict = {'model': model.state_dict(),'optimizer': optimizer.state_dict(),'epoch': epoch}
             torch.save(state_dict, model_save_path)
@@ -124,9 +125,10 @@ if __name__ == '__main__':
     if not os.path.isdir('save_model'):
         os.makedirs('save_model')
     best_acc = 0.0
+    target_names = ['happy', 'angry', 'sad', 'neutral'] 
     for epoch in range(args.num_epochs):
         train(dataloader_train,epoch)
-        best_acc = test(dataloader_test,epoch, best_acc)
+        best_acc = test(dataloader_test,epoch, best_acc, target_names)
         
     
     
