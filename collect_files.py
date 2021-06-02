@@ -50,6 +50,8 @@ def collect_durations():
     with open('wav_collect_files.pkl', 'rb') as f:         
         data_dict = pickle.load(f)
         duration_dict = {}
+        duration_dict[1] = 0
+        duration_dict[2] = 0
         duration_dict[4] = 0
         duration_dict[8] = 0
         duration_dict[12] = 0
@@ -58,7 +60,11 @@ def collect_durations():
             for wave_name in data_dict[speaker]:
                 wav, _ = torchaudio.load(data_dict[speaker][wave_name]['wav_path'])
                 dur = wav.shape[1] / 16000
-                if dur < 4:
+                if dur < 1:
+                    duration_dict[1] += 1
+                elif dur < 2:
+                    duration_dict[2] += 1
+                elif dur < 4:
                     duration_dict[4] += 1
                 elif dur < 8:
                     duration_dict[8] += 1
