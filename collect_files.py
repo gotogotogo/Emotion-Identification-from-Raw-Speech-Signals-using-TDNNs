@@ -56,7 +56,7 @@ def collect_durations():
         duration_dict[20] = 0
         for speaker in data_dict:
             for wave_name in data_dict[speaker]:
-                wav, _ = torchaudio.load(wave_name)
+                wav, _ = torchaudio.load(data_dict[speaker][wave_name]['wav_path'])
                 dur = wav.shape[1] / 16000
                 if dur < 4:
                     duration_dict[4] += 1
