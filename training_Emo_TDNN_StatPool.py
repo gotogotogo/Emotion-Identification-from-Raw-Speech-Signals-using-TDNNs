@@ -15,7 +15,7 @@ import os
 from torch import optim
 import argparse
 from models.Emo_Raw_TDNN_StatPool import Emo_Raw_TDNN
-from sklearn.metrics import balanced_accuracy_score, classification_report
+from sklearn.metrics import balanced_accuracy_score, classification_report, confusion_matrix
 from utils.utils_wav import speech_collate
 import torch.nn.functional as F
 torch.multiprocessing.set_sharing_strategy('file_system')
@@ -113,12 +113,13 @@ def test(test_loader,epoch, best_acc, target_names):
         mean_loss = np.mean(np.asarray(val_loss_list))
         print('[epoch {}] test loss {} test unweighted average recall {}\n'.format(epoch, mean_loss, unweighted_avg_recall))
         if unweighted_avg_recall > best_acc:
+            print('-' * 20, 'best model in epoch {} '.format(epoch), '-' * 20) 
             best_acc = unweighted_avg_recall
             print(classification_report(full_gts, full_preds, target_names=target_names))
+            print('confusion matrix: ', confusion_matrix(full_gts, full_preds))
             model_save_path = os.path.join('save_model', 'best_'+str(epoch)+'_'+str(round(unweighted_avg_recall, 5)))
             state_dict = {'model': model.state_dict(),'optimizer': optimizer.state_dict(),'epoch': epoch}
             torch.save(state_dict, model_save_path)
-            print('-' * 20, 'best model in epoch {} '.format(epoch), '-' * 20)
     return best_acc
     
 if __name__ == '__main__':
