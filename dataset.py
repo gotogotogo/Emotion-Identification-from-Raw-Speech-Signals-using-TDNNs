@@ -13,6 +13,7 @@ class CustomDataset(Dataset):
         self.wav_paths = []
         self.labels = []
         self.gender_labels = []
+        self.data = []
         if self.mode == 'train':
             for session in data_dict:
                 if session[-1] != str(test_sess):
@@ -28,7 +29,12 @@ class CustomDataset(Dataset):
                         self.labels.append(data_dict[session][wav_name]['emotion'])
                         self.gender_labels.append(data_dict[session][wav_name]['gender'])
         else:
-            assert False, 'Lawless mode!'
+            assert False, 'Wrong mode!'
+        for wav_path in self.wav_paths:
+            extend_wav = utils_wav.load_wav(wav_path,min_dur_sec=8)
+            self.data.append(extend_wav)
+        with open('data.pkl', 'wb') as f:
+            pickle.dump(self.data, f)
         print(len(self.labels))
 
     def __len__(self):
@@ -41,3 +47,6 @@ class CustomDataset(Dataset):
         extend_wav = utils_wav.load_wav(wav_path,min_dur_sec=8)
         sample = {'raw_speech': torch.from_numpy(np.ascontiguousarray(extend_wav)), 'labels': torch.from_numpy(np.ascontiguousarray(label))}
         return sample
+
+def augment(waveform):
+    pass
