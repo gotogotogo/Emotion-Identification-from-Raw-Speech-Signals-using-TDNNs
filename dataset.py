@@ -18,7 +18,7 @@ class CustomDataset(Dataset):
         self.labels = []
         self.gender_labels = []
         self.aug_data = []
-        self.aug_label = []
+        self.aug_labels = []
         if self.mode == 'train':
             for session in data_dict:
                 if session[-1] != str(test_sess):
@@ -33,11 +33,11 @@ class CustomDataset(Dataset):
             for i in range(len(self.wav_paths)):
                 waveform, sr = torchaudio.load(self.wav_paths[i])
                 self.aug_data.append(utils_wav.truncate_wav(self.resample1(waveform), sr, 8))
-                self.aug_label.append(self.labels[i])
+                self.aug_labels.append(self.labels[i])
                 self.aug_data.append(utils_wav.truncate_wav(self.resample2(waveform), sr, 8))
-                self.aug_label.append(self.labels[i])
+                self.aug_labels.append(self.labels[i])
                 self.aug_data.append(utils_wav.truncate_wav(self.resample3(waveform), sr, 8))
-                self.aug_label.append(self.labels[i])
+                self.aug_labels.append(self.labels[i])
         elif self.mode == 'test':
             for session in data_dict:
                 if session[-1] == str(test_sess):
@@ -49,15 +49,15 @@ class CustomDataset(Dataset):
                 waveform, sr = torchaudio.load(self.wav_paths[i])
                 extend_wav = utils_wav.truncate_wav(waveform, sr, 8)
                 self.aug_data.append(extend_wav)
-                self.aug_label.append(self.labels[i])
+                self.aug_labels.append(self.labels[i])
         else:
             assert False, 'Wrong mode!'
         
         print(len(self.labels))
-        print(len(self.aug_label))
+        print(len(self.aug_labels))
 
     def __len__(self):
-        return len(self.labels)
+        return len(self.aug_labels)
     
     def __getitem__(self, index):
         # wav_path = self.wav_paths[index]
@@ -67,6 +67,6 @@ class CustomDataset(Dataset):
         # sample = {'raw_speech': torch.from_numpy(np.ascontiguousarray(extend_wav)), 'labels': torch.from_numpy(np.ascontiguousarray(label))}
         # return sample
         extend_wav = self.aug_data[index]
-        label = self.aug_label[index]
+        label = self.aug_labels[index]
         sample = {'raw_speech': torch.from_numpy(np.ascontiguousarray(extend_wav)), 'labels': torch.from_numpy(np.ascontiguousarray(label))}
         return sample
