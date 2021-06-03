@@ -33,7 +33,7 @@ class CustomDataset(Dataset):
         for wav_path in self.wav_paths:
             extend_wav = utils_wav.load_wav(wav_path,min_dur_sec=8)
             self.data.append(extend_wav)
-        with open('data.pkl', 'wb') as f:
+        with open(self.mode + '_data.pkl', 'wb') as f:
             pickle.dump(self.data, f)
         print(len(self.labels))
 
