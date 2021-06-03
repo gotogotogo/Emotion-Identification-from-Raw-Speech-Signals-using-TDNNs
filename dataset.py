@@ -6,7 +6,7 @@ from torchaudio.transforms import Resample
 
 import numpy as np
 import pickle
-from utils import truncate_wav
+from utils import utils_wav
 
 
 class CustomDataset(Dataset):
@@ -40,11 +40,11 @@ class CustomDataset(Dataset):
         self.resample3 = Resample(16000, 16000 * 1.1)
         for i in len(self.wav_paths):
             waveform, sr = torchaudio.load(self.wav_paths[i])
-            self.aug_data.append(truncate_wav(self.resample1(waveform), sr, 8))
+            self.aug_data.append(utils_wav.truncate_wav(self.resample1(waveform), sr, 8))
             self.aug_label.append(self.labels[i])
-            self.aug_data.append(truncate_wav(self.resample2(waveform), sr, 8))
+            self.aug_data.append(utils_wav.truncate_wav(self.resample2(waveform), sr, 8))
             self.aug_label.append(self.labels[i])
-            self.aug_data.append(truncate_wav(self.resample3(waveform), sr, 8))
+            self.aug_data.append(utils_wav.truncate_wav(self.resample3(waveform), sr, 8))
             self.aug_label.append(self.labels[i])
         print(len(self.labels))
         print(len(self.aug_label))
