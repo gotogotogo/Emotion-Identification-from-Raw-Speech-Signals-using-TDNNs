@@ -38,7 +38,7 @@ class CustomDataset(Dataset):
         self.resample1 = Resample(16000, 16000 * 0.9)
         self.resample2 = Resample(16000, 16000 * 1.0)
         self.resample3 = Resample(16000, 16000 * 1.1)
-        for i in len(self.wav_paths):
+        for i in range(len(self.wav_paths)):
             waveform, sr = torchaudio.load(self.wav_paths[i])
             self.aug_data.append(utils_wav.truncate_wav(self.resample1(waveform), sr, 8))
             self.aug_label.append(self.labels[i])
