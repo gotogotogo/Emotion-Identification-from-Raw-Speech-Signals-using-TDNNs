@@ -32,11 +32,11 @@ class CustomDataset(Dataset):
             self.resample3 = Resample(16000, 16000 * 1.1)
             for i in range(len(self.wav_paths)):
                 waveform, sr = torchaudio.load(self.wav_paths[i])
-                self.aug_data.append(utils_wav.truncate_wav(self.resample1(waveform), sr, 8))
+                self.aug_data.append(utils_wav.truncate_wav(self.resample1(waveform), sr, 7))
                 self.aug_labels.append(self.labels[i])
-                self.aug_data.append(utils_wav.truncate_wav(self.resample2(waveform), sr, 8))
+                self.aug_data.append(utils_wav.truncate_wav(self.resample2(waveform), sr, 7))
                 self.aug_labels.append(self.labels[i])
-                self.aug_data.append(utils_wav.truncate_wav(self.resample3(waveform), sr, 8))
+                self.aug_data.append(utils_wav.truncate_wav(self.resample3(waveform), sr, 7))
                 self.aug_labels.append(self.labels[i])
         elif self.mode == 'test':
             for session in data_dict:
@@ -47,13 +47,17 @@ class CustomDataset(Dataset):
                         self.gender_labels.append(data_dict[session][wav_name]['gender'])
             for i in range(len(self.wav_paths)):
                 waveform, sr = torchaudio.load(self.wav_paths[i])
-                extend_wav = utils_wav.truncate_wav(waveform, sr, 8)
+                extend_wav = utils_wav.truncate_wav(waveform, sr, 7)
                 self.aug_data.append(extend_wav)
                 self.aug_labels.append(self.labels[i])
         else:
             assert False, 'Wrong mode!'
         
         print(len(self.labels))
+        label_dict = {0: 'happy', 1: 'angry', 2: 'sad', 3: 'neutral'}
+        for i in range(4):
+            total = sum(np.array(self.labels) == i)
+            print(label_dict[i], total)
         print(len(self.aug_labels))
 
     def __len__(self):
