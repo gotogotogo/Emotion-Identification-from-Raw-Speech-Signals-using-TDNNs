@@ -107,11 +107,11 @@ class Emo_Raw_TDNN(nn.Module):
         mean = torch.mean(lstm3_out,1)
         std = torch.var(lstm3_out,1)
         stat_pooling = torch.cat((mean,std),1)
-        
+
         stat_pooling = self.fc1(stat_pooling)
         stat_pooling = F.relu(stat_pooling)
-        stat_pooling = self.fc2(stat_pooling)
-        emo_predictions= self.fc(stat_pooling)
+        #stat_pooling = self.fc2(stat_pooling)
+        emo_predictions= self.fc2(stat_pooling)
         return emo_predictions
     
     
