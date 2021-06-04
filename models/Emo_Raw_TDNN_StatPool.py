@@ -29,7 +29,7 @@ class CNN_frontend(nn.Module):
 
 
     def forward(self, x):
-        # N x 1 x 160000
+        # N x 1 x 16000*8
         out = self.nin1(x)
         #print('1-1 ', out.shape)
         out = F.relu(self.bn1(out))
@@ -47,7 +47,7 @@ class CNN_frontend(nn.Module):
         out = F.relu(self.bn3(out))
         out = self.maxpool3(out)
         #print('3-2 ', out.shape)
-        # N x 128 x 311
+        # N x 128 x 311     
         return out
 
 class NIN(nn.Module):
@@ -85,8 +85,8 @@ class Emo_Raw_TDNN(nn.Module):
         self.tdnn5 = TDNN(input_dim=128, output_dim=128, context_size=7, dilation=3,dropout_p=0.5)
         
         self.lstm3 = nn.LSTM(input_size=128, hidden_size=64,num_layers=1,bidirectional=True,dropout=0.5,batch_first=True)     
-        self.fc = nn.Linear(2*128,num_classes)
-        
+        self.fc1 = nn.Linear(2*128,64)
+        self.fc2 = nn.Linear(64, num_classes)        
         
         
     def forward(self, inputs):
@@ -107,7 +107,10 @@ class Emo_Raw_TDNN(nn.Module):
         mean = torch.mean(lstm3_out,1)
         std = torch.var(lstm3_out,1)
         stat_pooling = torch.cat((mean,std),1)
-        #print('stat pooling shape:', stat_pooling.shape)
+        
+        stat_pooling = self.fc1(stat_pooling)
+        stat_pooling = F.relu(stat_pooling)
+        stat_pooling = self.fc2(stat_pooling)
         emo_predictions= self.fc(stat_pooling)
         return emo_predictions
     
