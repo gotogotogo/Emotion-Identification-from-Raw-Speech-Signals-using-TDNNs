@@ -103,15 +103,16 @@ class Emo_Raw_TDNN(nn.Module):
         tdnn4_out = self.tdnn4(lstm2_out)
         tdnn5_out = self.tdnn5(tdnn4_out)
         lstm3_out, (final_hidden_state, final_cell_state) = self.lstm3(tdnn5_out)
-        print('lstm3 output shape: ', lstm3_out.shape)
+        # print('lstm3 output shape: ', lstm3_out.shape)
 
-        # lstm3_out = lstm3_out.permute(1, 0, 2)
-        # lstm3_out = self.multihead_attn(lstm3_out, lstm3_out, lstm3_out)
-        # lstm3_out = lstm3_out.permute(1, 0, 2) 
+        lstm3_out = lstm3_out.permute(1, 0, 2)
+        lstm3_out = self.multihead_attn(lstm3_out, lstm3_out, lstm3_out)
+        lstm3_out = lstm3_out.permute(1, 0, 2) 
+        print('attention shape: ', lstm3_out.shape)
 
         ### Stat Pool
         mean = torch.mean(lstm3_out,1)
-        print('mean shape: ', mean.shape)
+        # print('mean shape: ', mean.shape)
         std = torch.var(lstm3_out,1)
         stat_pooling = torch.cat((mean,std),1)
 
