@@ -72,19 +72,20 @@ class Emo_Raw_TDNN(nn.Module):
         
         self.tdnn1 = TDNN(input_dim=128, output_dim=128, context_size=3, dilation=1,dropout_p=0.5)
         
-        self.lstm1 = nn.LSTM(input_size=128, hidden_size=128,num_layers=1,bidirectional=False,dropout=0.5,batch_first=True)     
+        self.lstm1 = nn.LSTM(input_size=128, hidden_size=64,num_layers=1,bidirectional=True,dropout=0.5,batch_first=True)     
         
         self.tdnn2 = TDNN(input_dim=128, output_dim=128, context_size=7, dilation=3,dropout_p=0.5)
         
         self.tdnn3 = TDNN(input_dim=128, output_dim=128, context_size=7, dilation=3,dropout_p=0.5)
         
-        self.lstm2 = nn.LSTM(input_size=128, hidden_size=128,num_layers=1,bidirectional=False,dropout=0.5,batch_first=True)     
+        self.lstm2 = nn.LSTM(input_size=128, hidden_size=64,num_layers=1,bidirectional=True,dropout=0.5,batch_first=True)     
         
         self.tdnn4 = TDNN(input_dim=128, output_dim=128, context_size=7, dilation=3,dropout_p=0.5)
         
         self.tdnn5 = TDNN(input_dim=128, output_dim=128, context_size=7, dilation=3,dropout_p=0.5)
         
-        self.lstm3 = nn.LSTM(input_size=128, hidden_size=128,num_layers=1,bidirectional=False,dropout=0.5,batch_first=True)     
+        self.lstm3 = nn.LSTM(input_size=128, hidden_size=64,num_layers=1,bidirectional=True,dropout=0.5,batch_first=True)     
+        self.multihead_attn = nn.MultiheadAttention(embed_dim=128, num_heads=8)
         self.fc = nn.Linear(2*128,num_classes)
         
         
@@ -102,6 +103,12 @@ class Emo_Raw_TDNN(nn.Module):
         tdnn4_out = self.tdnn4(lstm2_out)
         tdnn5_out = self.tdnn5(tdnn4_out)
         lstm3_out, (final_hidden_state, final_cell_state) = self.lstm3(tdnn5_out)
+        print('lstm3 output shape: ', lstm3_out.shape)
+
+        # lstm3_out = lstm3_out.permute(1, 0, 2)
+        # lstm3_out = self.multihead_attn(lstm3_out, lstm3_out, lstm3_out)
+        # lstm3_out = lstm3_out.permute(1, 0, 2) 
+
         ### Stat Pool
         mean = torch.mean(lstm3_out,1)
         std = torch.var(lstm3_out,1)
