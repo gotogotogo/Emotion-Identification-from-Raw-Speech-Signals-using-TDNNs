@@ -72,19 +72,19 @@ class Emo_Raw_TDNN(nn.Module):
         
         self.tdnn1 = TDNN(input_dim=128, output_dim=128, context_size=3, dilation=1,dropout_p=0.5)
         
-        self.lstm1 = nn.LSTM(input_size=128, hidden_size=64,num_layers=1,bidirectional=False,dropout=0.5,batch_first=True)     
+        self.lstm1 = nn.LSTM(input_size=128, hidden_size=128,num_layers=1,bidirectional=False,dropout=0.5,batch_first=True)     
         
         self.tdnn2 = TDNN(input_dim=128, output_dim=128, context_size=7, dilation=3,dropout_p=0.5)
         
         self.tdnn3 = TDNN(input_dim=128, output_dim=128, context_size=7, dilation=3,dropout_p=0.5)
         
-        self.lstm2 = nn.LSTM(input_size=128, hidden_size=64,num_layers=1,bidirectional=False,dropout=0.5,batch_first=True)     
+        self.lstm2 = nn.LSTM(input_size=128, hidden_size=128,num_layers=1,bidirectional=False,dropout=0.5,batch_first=True)     
         
         self.tdnn4 = TDNN(input_dim=128, output_dim=128, context_size=7, dilation=3,dropout_p=0.5)
         
         self.tdnn5 = TDNN(input_dim=128, output_dim=128, context_size=7, dilation=3,dropout_p=0.5)
         
-        self.lstm3 = nn.LSTM(input_size=128, hidden_size=64,num_layers=1,bidirectional=False,dropout=0.5,batch_first=True)     
+        self.lstm3 = nn.LSTM(input_size=128, hidden_size=128,num_layers=1,bidirectional=False,dropout=0.5,batch_first=True)     
         self.fc = nn.Linear(2*128,num_classes)
         
         
