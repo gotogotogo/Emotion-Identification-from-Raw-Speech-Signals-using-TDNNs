@@ -111,6 +111,7 @@ class Emo_Raw_TDNN(nn.Module):
 
         ### Stat Pool
         mean = torch.mean(lstm3_out,1)
+        print('mean shape: ', mean.shape)
         std = torch.var(lstm3_out,1)
         stat_pooling = torch.cat((mean,std),1)
 
