@@ -106,7 +106,7 @@ class Emo_Raw_TDNN(nn.Module):
         # print('lstm3 output shape: ', lstm3_out.shape)
 
         lstm3_out = lstm3_out.permute(1, 0, 2)
-        lstm3_out = self.multihead_attn(lstm3_out, lstm3_out, lstm3_out)
+        lstm3_out, _ = self.multihead_attn(lstm3_out, lstm3_out, lstm3_out)
         lstm3_out = lstm3_out.permute(1, 0, 2) 
         print('attention shape: ', lstm3_out.shape)
 
