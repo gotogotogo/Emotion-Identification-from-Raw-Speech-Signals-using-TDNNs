@@ -38,7 +38,7 @@ args = parser.parse_args()
 class Cross_Entropy_Loss_Label_Smooth(nn.Module):
     def __init__(self, num_classes=4, epsilon=0.1):
         super(Cross_Entropy_Loss_Label_Smooth, self).__init__()
-        self.num_classed = 4
+        self.num_classes = num_classes
         self.epsilon = epsilon
     
     def forward(self, outputs, targets):
