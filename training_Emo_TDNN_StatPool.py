@@ -45,7 +45,7 @@ class Cross_Entropy_Loss_Label_Smooth(nn.Module):
         N = targets.size(0)
         smoothed_labels = torch.full(size = (N, self.num_classes), fill_value = self.epsilon / (self.num_classes - 1))
         targets = targets.data
-        smoothed_labels.scatter_(dim = 1, index = torch.unsqueeze(targets, dim = 1), value = 1 - epsilon)
+        smoothed_labels.scatter_(dim = 1, index = torch.unsqueeze(targets, dim = 1), value = 1 - self.epsilon)
         log_prob = nn.functional.log_softmax(outputs, dim = 1)
         loss = - torch.sum(log_prob * smoothed_labels) / N
         return loss 
