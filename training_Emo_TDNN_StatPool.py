@@ -35,6 +35,21 @@ parser.add_argument('-use_gpu', action="store_true", default=True)
 parser.add_argument('-num_epochs', action="store_true", default=1000)
 args = parser.parse_args()
 
+class Cross_Entropy_Loss_Label_Smooth(nn.Module):
+    def __init__(self, num_classes=4, epsilon=0.1):
+        super(Cross_Entropy_Loss_Label_Smooth, self).__init__()
+        self.num_classed = 4
+        self.epsilon = epsilon
+    
+    def forward(self, outputs, targets):
+        N = targets.size(0)
+        smoothed_labels = torch.full(size = (N, self.num_classes), fill_value = self.epsilon / (self.num_classes - 1))
+        targets = targets.data
+        smoothed_labels.scatter_(dim = 1, index = torch.unsqueeze(targets, dim = 1), value = 1 - epsilon)
+        log_prob = nn.functional.log_softmax(outputs, dim = 1)
+        loss = - torch.sum(log_prob * smoothed_labels) / N
+        return loss 
+
 ### Data related
 dataset_train = CustomDataset(args.wav_files_collect_path, mode='train', test_sess=5)
 dataloader_train = DataLoader(dataset_train, batch_size=args.batch_size, shuffle=True, drop_last=True, collate_fn=speech_collate)  
@@ -51,20 +66,6 @@ optimizer = optim.Adam(model.parameters(), lr=0.0001, weight_decay=0.000001, bet
 #loss_fun = nn.CrossEntropyLoss()
 loss_fun = Cross_Entropy_Loss_Label_Smooth()
 
-class Cross_Entropy_Loss_Label_Smooth(nn.Module):
-    def __init__(self, num_classes=4, epsilon=0.1):
-        super(Cross_Entropy_Loss_Label_Smooth, self).__init__()
-        self.num_classed = 4
-        self.epsilon = epsilon
-    
-    def forward(self, outputs, targets):
-        N = targets.size(0)
-        smoothed_labels = torch.full(size = (N, self.num_classes), fill_value = self.epsilon / (self.num_classes - 1))
-        targets = targets.data
-        smoothed_labels.scatter_(dim = 1, index = torch.unsqueeze(targets, dim = 1), value = 1 - epsilon)
-        log_prob = nn.functional.log_softmax(outputs, dim = 1)
-        loss = - torch.sum(log_prob * smoothed_labels) / N
-        return loss 
 
 
 def train(train_loader,epoch):
