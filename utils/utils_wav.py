@@ -1,4 +1,5 @@
-# Third Party
+import torch
+import torch.nn as nn
 import torchaudio
 import numpy as np
 
@@ -22,3 +23,4 @@ def speech_collate(batch):
         raw_data.append(sample['raw_speech'])
         targets.append((sample['labels']))
     return raw_data, targets
+

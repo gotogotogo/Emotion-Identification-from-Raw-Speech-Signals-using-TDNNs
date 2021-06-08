@@ -48,8 +48,23 @@ device = torch.device("cuda" if use_cuda else "cpu")
 print('device: ', device)
 model = Emo_Raw_TDNN(args.num_classes).to(device)
 optimizer = optim.Adam(model.parameters(), lr=0.0001, weight_decay=0.000001, betas=(0.9, 0.98), eps=1e-9)
-loss_fun = nn.CrossEntropyLoss()
+#loss_fun = nn.CrossEntropyLoss()
+loss_fun = Cross_Entropy_Loss_Label_Smooth()
 
+class Cross_Entropy_Loss_Label_Smooth(nn.Module):
+    def __init__(self, num_classes=4, epsilon=0.1):
+        super(Cross_Entropy_Loss_Label_Smooth, self).__init__()
+        self.num_classed = 4
+        self.epsilon = epsilon
+    
+    def forward(self, outputs, targets):
+        N = targets.size(0)
+        smoothed_labels = torch.full(size = (N, self.num_classes), fill_value = self.epsilon / (self.num_classes - 1))
+        targets = targets.data
+        smoothed_labels.scatter_(dim = 1, index = torch.unsqueeze(targets, dim = 1), value = 1 - epsilon)
+        log_prob = nn.functional.log_softmax(outputs, dim = 1)
+        loss = - torch.sum(log_prob * smoothed_labels) / N
+        return loss 
 
 
 def train(train_loader,epoch):
