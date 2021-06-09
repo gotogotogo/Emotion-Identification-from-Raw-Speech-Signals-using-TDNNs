@@ -119,17 +119,17 @@ class Emo_Raw_TDNN(nn.Module):
         # 64 x 248 x 128
         atten1_out, _ = self.atten1(self.Q1, cnn_out, cnn_out)
         lstm1_out, _ = self.lstm1(atten1_out)
-        print('lstm1 out', lstm1_out.shape)
+        #print('lstm1 out', lstm1_out.shape)
 
         # 64 x 128 x 128
         atten2_out, _ = self.atten2(self.Q2, lstm1_out, lstm1_out)
         lstm2_out, _ = self.lstm2(atten2_out)
-        print('lstm2 out', lstm2_out.shape)
+        #print('lstm2 out', lstm2_out.shape)
 
         # 64 x 64  x 128
         atten3_out, _ = self.atten3(self.Q3, lstm2_out, lstm2_out)
         lstm3_out, _ = self.lstm3(atten3_out)
-        print('lstm3 out', lstm3_out.shape)
+        #print('lstm3 out', lstm3_out.shape)
 
         # 64 x 32 x 128
         lstm3_out, _ = self.multihead_attn(lstm3_out, lstm3_out, lstm3_out)
