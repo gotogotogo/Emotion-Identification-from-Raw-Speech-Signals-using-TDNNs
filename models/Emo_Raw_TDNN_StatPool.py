@@ -70,7 +70,7 @@ class Emo_Raw_TDNN(nn.Module):
         self.cnn_frontend = CNN_frontend()
         
         self.tdnn1 = TDNN(input_dim=128, output_dim=128, context_size=3, dilation=1,dropout_p=0.5)
-        self.Q1 = torch.nn.Parameter(torch.ones(64, 128, 128))
+        self.Q1 = torch.nn.Parameter(torch.randn(64, 128, 128))
         self.atten1 = nn.MultiheadAttention(embed_dim=128, num_heads=8)
 
         self.lstm1 = nn.LSTM(input_size=128, hidden_size=64,num_layers=1,bidirectional=True,dropout=0.5,batch_first=True)     
@@ -78,7 +78,7 @@ class Emo_Raw_TDNN(nn.Module):
         self.tdnn2 = TDNN(input_dim=128, output_dim=128, context_size=7, dilation=3,dropout_p=0.5)
         
         self.tdnn3 = TDNN(input_dim=128, output_dim=128, context_size=7, dilation=3,dropout_p=0.5)
-        self.Q2 = torch.nn.Parameter(torch.zeros(64, 64, 128))
+        self.Q2 = torch.nn.Parameter(torch.randn(64, 64, 128))
         self.atten2 = nn.MultiheadAttention(embed_dim=128, num_heads=8)
 
         self.lstm2 = nn.LSTM(input_size=128, hidden_size=64,num_layers=1,bidirectional=True,dropout=0.5,batch_first=True)     
@@ -86,7 +86,7 @@ class Emo_Raw_TDNN(nn.Module):
         self.tdnn4 = TDNN(input_dim=128, output_dim=128, context_size=7, dilation=3,dropout_p=0.5)
         
         self.tdnn5 = TDNN(input_dim=128, output_dim=128, context_size=7, dilation=3,dropout_p=0.5)
-        self.Q3 = torch.nn.Parameter(torch.ones(64, 32, 128))
+        self.Q3 = torch.nn.Parameter(torch.randn(64, 32, 128))
         self.atten3 = nn.MultiheadAttention(embed_dim=128, num_heads=8)
 
         self.lstm3 = nn.LSTM(input_size=128, hidden_size=64,num_layers=1,bidirectional=True,dropout=0.5,batch_first=True)     
@@ -96,8 +96,6 @@ class Emo_Raw_TDNN(nn.Module):
         
     def forward(self, inputs):
         cnn_out = self.cnn_frontend(inputs)
-        print(torch.mean(cnn_out,1))
-        print(torch.var(cnn_out, 1))
         #print('frontend output shape:', cnn_out.shape) 
         # 64 x 128 x 248
         # cnn_out = cnn_out.permute(0,2,1)
