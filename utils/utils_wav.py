@@ -17,15 +17,15 @@ def truncate_wav(waveform, sr, duration):
         waveform = waveform.repeat(1, times)
         len_wav = len_wav * times
         dummy=np.zeros((1,standard_len - len_wav))
-        extened_wav = np.concatenate((waveform,dummy), axis = 1)
+        extend_wav = np.concatenate((waveform,dummy), axis = 1)
     elif len_wav > standard_len:
-        # extened_wav = waveform[:, :int(duration * sr)]
+        # extend_wav = waveform[:, :int(duration * sr)]
         indexes = get_random_index(len_wav, standard_len)
         extend_wav = waveform[:, indexes]
     else:
         extend_wav = waveform
-        
-    return extened_wav
+
+    return extend_wav
 
 def speed_perturbation():
     pass 
