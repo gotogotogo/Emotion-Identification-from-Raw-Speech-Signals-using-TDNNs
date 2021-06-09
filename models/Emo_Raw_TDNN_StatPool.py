@@ -117,6 +117,7 @@ class Emo_Raw_TDNN(nn.Module):
 
         cnn_out = cnn_out.permute(0, 2, 1)
         # 64 x 248 x 128
+        print(self.Q1)
         atten1_out, _ = self.atten1(self.Q1, cnn_out, cnn_out)
         lstm1_out, _ = self.lstm1(atten1_out)
         #print('lstm1 out', lstm1_out.shape)
