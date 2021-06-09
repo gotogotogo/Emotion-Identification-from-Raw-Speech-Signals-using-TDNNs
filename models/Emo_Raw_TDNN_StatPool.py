@@ -17,15 +17,15 @@ class CNN_frontend(nn.Module):
         super(CNN_frontend, self).__init__()
         self.nin1 = NIN(1, 64, kernel_size=7, stride=4, padding=3, bias=False)
         self.bn1 = nn.BatchNorm1d(64)
-        self.maxpool1 = nn.AvgPool1d(kernel_size=4, stride=2, padding=1)
+        self.maxpool1 = nn.MaxPool1d(kernel_size=4, stride=2, padding=1)
 
         self.nin2 = NIN(64, 128, kernel_size=7, stride=4, padding=3, bias=False)
         self.bn2 = nn.BatchNorm1d(128)
-        self.maxpool2 = nn.AvgPool1d(kernel_size=4, stride=2)
+        self.maxpool2 = nn.MaxPool1d(kernel_size=4, stride=2)
 
         self.nin3 = nn.Conv1d(128, 128, kernel_size=7, stride=4)
         self.bn3 = nn.BatchNorm1d(128)
-        self.maxpool3 = nn.AvgPool1d(kernel_size=4, stride=2)
+        self.maxpool3 = nn.MaxPool1d(kernel_size=4, stride=2)
 
 
     def forward(self, x):
