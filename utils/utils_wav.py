@@ -2,15 +2,29 @@ import torch
 import torch.nn as nn
 import torchaudio
 import numpy as np
+import random
 
+def get_random_index(max_num, length):
+    indexes = random.sample(range(0, max_num), length)
+    indexes.sort()
+    return indexes
 
 def truncate_wav(waveform, sr, duration):
     len_wav = waveform.shape[-1]
-    if len_wav <int(duration * sr):
-        dummy=np.zeros((1,int(duration * sr) - len_wav))
+    standard_len = int(duration * sr)
+    if len_wav < standard_len:
+        times = standard_len // len_wav
+        waveform = waveform.repeat(1, times)
+        len_wav = len_wav * times
+        dummy=np.zeros((1,standard_len - len_wav))
         extened_wav = np.concatenate((waveform,dummy), axis = 1)
+    elif len_wav > standard_len:
+        # extened_wav = waveform[:, :int(duration * sr)]
+        indexes = get_random_index(len_wav, standard_len)
+        extend_wav = waveform[:, indexes]
     else:
-        extened_wav = waveform[:, :int(duration * sr)]
+        extend_wav = waveform
+        
     return extened_wav
 
 def speed_perturbation():
