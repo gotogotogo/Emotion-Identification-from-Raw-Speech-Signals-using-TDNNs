@@ -62,6 +62,7 @@ class TDNN(nn.Module):
 
         # Unfold input into smaller temporal contexts
         x = F.unfold(x, (self.context_size, self.input_dim), stride=(1,self.input_dim),dilation=(self.dilation,1))
+        print('unfold out', x.shape)
         # N x channels x time_steps
         x = x.transpose(1,2)
         x = self.kernel(x.float())
