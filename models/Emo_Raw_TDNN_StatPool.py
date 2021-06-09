@@ -96,6 +96,8 @@ class Emo_Raw_TDNN(nn.Module):
         
     def forward(self, inputs):
         cnn_out = self.cnn_frontend(inputs)
+        print(torch.mean(cnn_out,1))
+        print(torch.var(cnn_out, 1))
         #print('frontend output shape:', cnn_out.shape) 
         # 64 x 128 x 248
         # cnn_out = cnn_out.permute(0,2,1)
