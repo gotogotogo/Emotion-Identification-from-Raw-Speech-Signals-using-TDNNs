@@ -92,16 +92,21 @@ class Emo_Raw_TDNN(nn.Module):
     def forward(self, inputs):
         cnn_out = self.cnn_frontend(inputs)
         #print('frontend output shape:', cnn_out.shape) 
-        #print('frontend output', cnn_out)
+        print('frontend output', cnn_out)
         cnn_out = cnn_out.permute(0,2,1)
         tdnn1_out = self.tdnn1(cnn_out)
+        print('tdnn1 out', tdnn1_out.shape)
         lstm1_out, (final_hidden_state, final_cell_state) = self.lstm1(tdnn1_out)
         tdnn2_out = self.tdnn2(lstm1_out)
+        print('tdnn2 out ', tdnn2_out.shape)
         tdnn3_out = self.tdnn3(tdnn2_out)
+        print('tdnn3 out', tdnn3_out.shape)
         lstm2_out, (final_hidden_state, final_cell_state) = self.lstm2(tdnn3_out)
         
         tdnn4_out = self.tdnn4(lstm2_out)
+        print('tdnn4 out', tdnn4_out.shape)
         tdnn5_out = self.tdnn5(tdnn4_out)
+        print('tdnn5 out', tdnn5_out.shape)
         lstm3_out, (final_hidden_state, final_cell_state) = self.lstm3(tdnn5_out)
         # print('lstm3 output shape: ', lstm3_out.shape)
 
