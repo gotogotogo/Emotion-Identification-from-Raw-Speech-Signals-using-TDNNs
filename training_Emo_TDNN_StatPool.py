@@ -62,6 +62,8 @@ use_cuda = torch.cuda.is_available()
 device = torch.device("cuda" if use_cuda else "cpu")
 print('device: ', device)
 model = Emo_Raw_TDNN(args.num_classes).to(device)
+for i in model.parameters():
+    print(i)
 Q1_p = list(map(id, model.Q1.parameters()))
 Q2_p = list(map(id, model.Q2.parameters()))
 Q3_p = list(map(id, model.Q3.parameters()))
