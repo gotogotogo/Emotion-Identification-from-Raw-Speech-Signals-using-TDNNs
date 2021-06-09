@@ -123,7 +123,7 @@ def test(test_loader,epoch, best_acc, target_names):
             val_loss_list.append(loss.item())
             #train_acc_list.append(accuracy)
             predictions = np.argmax(pred_logits.detach().cpu().numpy(),axis=1)
-            wrong_durations.extend(durations[predictions == labels])
+            wrong_durations.extend(durations[predictions != labels])
             for pred in predictions:
                 full_preds.append(pred)
             for lab in labels.detach().cpu().numpy():
