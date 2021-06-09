@@ -65,8 +65,16 @@ class NIN(nn.Module):
         return self.blk(x)
 
 # class CustomAttention(nn.Module):
-#     def __init__(self):
+#     def __init__(self, embed_dim, num_heads, context_size, stride=1, dilation=1, padding=0):
 #         super(CustomAttention, self).__init__()
+#         self.embed_dim = embed_dim
+#         self.num_heads = num_heads
+#         self.context_size = context_size
+#         self.dilation = dilation
+#         self.padding = padding
+    
+#     def forward(self, x):
+#         # N x seq x channels
 
 
 

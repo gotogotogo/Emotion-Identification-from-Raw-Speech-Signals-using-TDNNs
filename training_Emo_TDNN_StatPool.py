@@ -62,19 +62,7 @@ use_cuda = torch.cuda.is_available()
 device = torch.device("cuda" if use_cuda else "cpu")
 print('device: ', device)
 model = Emo_Raw_TDNN(args.num_classes).to(device)
-for i in model.parameters():
-    print(i)
-Q1_p = list(map(id, model.Q1.parameters()))
-Q2_p = list(map(id, model.Q2.parameters()))
-Q3_p = list(map(id, model.Q3.parameters()))
-other_p = filter(lambda p: id(p) not in Q1_p + Q2_p + Q3_p, model.parameters())
-# optimizer = optim.Adam(model.parameters(), lr=0.0001, weight_decay=0.000001, betas=(0.9, 0.98), eps=1e-9)
-lr = 0.0001
-optimizer = optim.Adam([{'params': other_p},
-                        {'params': model.Q1.parameters(), 'lr': lr * 100},
-                        {'params': model.Q2.parameters(), 'lr': lr * 100},
-                        {'params': model.Q3.parameters(), 'lr': lr * 100}
-                    ], lr=lr, weight_decay=0.000001, betas=(0.9, 0.98), eps=1e-9)
+optimizer = optim.Adam(model.parameters(), lr=0.0001, weight_decay=0.000001, betas=(0.9, 0.98), eps=1e-9)
 #loss_fun = nn.CrossEntropyLoss()
 loss_fun = Cross_Entropy_Loss_Label_Smooth()
 
