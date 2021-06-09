@@ -11,6 +11,7 @@ def get_random_index(max_num, length):
 
 def truncate_wav(waveform, sr, duration):
     len_wav = waveform.shape[-1]
+    dur_wav = len_wav / sr
     standard_len = int(duration * sr)
     if len_wav < standard_len:
         times = standard_len // len_wav
@@ -25,7 +26,7 @@ def truncate_wav(waveform, sr, duration):
     else:
         extend_wav = waveform
 
-    return extend_wav
+    return extend_wav, dur_wav
 
 def speed_perturbation():
     pass 
@@ -33,8 +34,10 @@ def speed_perturbation():
 def speech_collate(batch):
     targets = []
     raw_data = []
+    duration = []
     for sample in batch:
         raw_data.append(sample['raw_speech'])
-        targets.append((sample['labels']))
-    return raw_data, targets
+        targets.append(sample['labels'])
+        duration.append(sample['labels'])
+    return raw_data, targets, duration
 

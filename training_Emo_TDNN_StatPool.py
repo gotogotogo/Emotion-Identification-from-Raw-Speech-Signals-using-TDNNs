@@ -74,7 +74,7 @@ def train(train_loader,epoch):
     full_gts=[]
     model.train()
     train_loader = tqdm(train_loader)
-    for step, (features, labels) in enumerate(train_loader):
+    for step, (features, labels, _) in enumerate(train_loader):
         #print(features.shape)
         features = torch.from_numpy(np.asarray([torch_tensor.numpy() for torch_tensor in features])).float()         
         labels = torch.from_numpy(np.asarray([torch_tensor[0].numpy() for torch_tensor in labels]))
@@ -110,16 +110,20 @@ def test(test_loader,epoch, best_acc, target_names):
         val_loss_list=[]
         full_preds=[]
         full_gts=[]
+        wrong_durations = []
         for i_batch, sample_batched in enumerate(test_loader):
             features = torch.from_numpy(np.asarray([torch_tensor.numpy() for torch_tensor in sample_batched[0]])).float()
             labels = torch.from_numpy(np.asarray([torch_tensor[0].numpy() for torch_tensor in sample_batched[1]]))
+            durations = torch.from_numpy(np.asarray([torch_tensor[0].numpy() for torch_tensor in sample_batched[2]]))
             features, labels = features.to(device),labels.to(device)
+            durations = durations.to(device)
             pred_logits = model(features)
             #### CE loss
             loss = loss_fun(pred_logits,labels)
             val_loss_list.append(loss.item())
             #train_acc_list.append(accuracy)
             predictions = np.argmax(pred_logits.detach().cpu().numpy(),axis=1)
+            wrong_durations.extend(durations[predictions == labels])
             for pred in predictions:
                 full_preds.append(pred)
             for lab in labels.detach().cpu().numpy():
@@ -136,6 +140,8 @@ def test(test_loader,epoch, best_acc, target_names):
             model_save_path = os.path.join('save_model', 'best_'+str(epoch)+'_'+str(round(unweighted_avg_recall, 5)))
             state_dict = {'model': model.state_dict(),'optimizer': optimizer.state_dict(),'epoch': epoch}
             torch.save(state_dict, model_save_path)
+        for i in range(len(wrong_durations)):
+            print(i, wrong_durations[i])
     return best_acc
     
 if __name__ == '__main__':
