@@ -70,7 +70,7 @@ class Emo_Raw_TDNN(nn.Module):
         self.cnn_frontend = CNN_frontend()
         
         self.tdnn1 = TDNN(input_dim=128, output_dim=128, context_size=3, dilation=1,dropout_p=0.5)
-        self.Q1 = torch.nn.Parameter(torch.zeros(64, 128, 128))
+        self.Q1 = torch.nn.Parameter(torch.ones(64, 128, 128))
         self.atten1 = nn.MultiheadAttention(embed_dim=128, num_heads=8)
 
         self.lstm1 = nn.LSTM(input_size=128, hidden_size=64,num_layers=1,bidirectional=True,dropout=0.5,batch_first=True)     
@@ -86,7 +86,7 @@ class Emo_Raw_TDNN(nn.Module):
         self.tdnn4 = TDNN(input_dim=128, output_dim=128, context_size=7, dilation=3,dropout_p=0.5)
         
         self.tdnn5 = TDNN(input_dim=128, output_dim=128, context_size=7, dilation=3,dropout_p=0.5)
-        self.Q3 = torch.nn.Parameter(torch.zeros(64, 32, 128))
+        self.Q3 = torch.nn.Parameter(torch.ones(64, 32, 128))
         self.atten3 = nn.MultiheadAttention(embed_dim=128, num_heads=8)
 
         self.lstm3 = nn.LSTM(input_size=128, hidden_size=64,num_layers=1,bidirectional=True,dropout=0.5,batch_first=True)     
@@ -117,7 +117,7 @@ class Emo_Raw_TDNN(nn.Module):
 
         cnn_out = cnn_out.permute(0, 2, 1)
         # 64 x 248 x 128
-        print(self.Q1)
+        #print(self.Q1)
         atten1_out, _ = self.atten1(self.Q1, cnn_out, cnn_out)
         lstm1_out, _ = self.lstm1(atten1_out)
         #print('lstm1 out', lstm1_out.shape)
