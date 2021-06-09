@@ -64,6 +64,13 @@ class NIN(nn.Module):
     def forward(self, x):
         return self.blk(x)
 
+# class CustomAttention(nn.Module):
+#     def __init__(self):
+#         super(CustomAttention, self).__init__()
+
+
+
+
 class Emo_Raw_TDNN(nn.Module):
     def __init__(self, num_classes=4):
         super(Emo_Raw_TDNN, self).__init__()
