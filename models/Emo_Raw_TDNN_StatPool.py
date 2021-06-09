@@ -92,7 +92,7 @@ class Emo_Raw_TDNN(nn.Module):
     def forward(self, inputs):
         cnn_out = self.cnn_frontend(inputs)
         #print('frontend output shape:', cnn_out.shape) 
-        print('frontend output', cnn_out)
+        print('frontend output', cnn_out.shape)
         cnn_out = cnn_out.permute(0,2,1)
         tdnn1_out = self.tdnn1(cnn_out)
         print('tdnn1 out', tdnn1_out.shape)
