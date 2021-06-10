@@ -38,6 +38,6 @@ def speech_collate(batch):
     for sample in batch:
         raw_data.append(sample['raw_speech'])
         targets.append(sample['labels'])
-        duration.append(sample['labels'])
+        duration.append(sample['duration'])
     return raw_data, targets, duration
 
