@@ -106,11 +106,11 @@ def train(train_loader,epoch):
 
 def test(test_loader,epoch, best_acc, target_names):
     model.eval()
+    duration_dict = {2: 0, 4: 0, 8: 0, 12:0, 20: 0}
     with torch.no_grad():
         val_loss_list=[]
         full_preds=[]
         full_gts=[]
-        wrong_durations = []
         for i_batch, sample_batched in enumerate(test_loader):
             features = torch.from_numpy(np.asarray([torch_tensor.numpy() for torch_tensor in sample_batched[0]])).float()
             labels = torch.from_numpy(np.asarray([torch_tensor[0].numpy() for torch_tensor in sample_batched[1]]))
@@ -125,7 +125,16 @@ def test(test_loader,epoch, best_acc, target_names):
             predictions = np.argmax(pred_logits.detach().cpu().numpy(),axis=1)
             for i in range(len(labels)):
                 if(labels[i] != predictions[i]):
-                    wrong_durations.append(durations[i])
+                    if durations[i] < 2:
+                        duration_dict[2] += 1
+                    elif durations[i] < 4:
+                        duration_dict[4] += 1
+                    elif durations[i] < 8:
+                        duration_dict[8] += 1
+                    elif durations[i] < 12:
+                        duration_dict[12] + 1
+                    else:
+                        duration_dict[20] += 1
             for pred in predictions:
                 full_preds.append(pred)
             for lab in labels.detach().cpu().numpy():
@@ -142,8 +151,7 @@ def test(test_loader,epoch, best_acc, target_names):
             model_save_path = os.path.join('save_model', 'best_'+str(epoch)+'_'+str(round(unweighted_avg_recall, 5)))
             state_dict = {'model': model.state_dict(),'optimizer': optimizer.state_dict(),'epoch': epoch}
             torch.save(state_dict, model_save_path)
-        for i in range(len(wrong_durations)):
-            print(i, wrong_durations[i])
+        print(duration_dict)
     return best_acc
     
 if __name__ == '__main__':
