@@ -57,21 +57,22 @@ def collect_durations():
         duration_dict[12] = 0
         duration_dict[20] = 0
         for speaker in data_dict:
-            for wave_name in data_dict[speaker]:
-                wav, _ = torchaudio.load(data_dict[speaker][wave_name]['wav_path'])
-                dur = wav.shape[1] / 16000
-                if dur < 1:
-                    duration_dict[1] += 1
-                elif dur < 2:
-                    duration_dict[2] += 1
-                elif dur < 4:
-                    duration_dict[4] += 1
-                elif dur < 8:
-                    duration_dict[8] += 1
-                elif dur < 12:
-                    duration_dict[12] += 1
-                else:
-                    duration_dict[20] += 1
+            if speaker[-1] == '5':
+                for wave_name in data_dict[speaker]:
+                    wav, _ = torchaudio.load(data_dict[speaker][wave_name]['wav_path'])
+                    dur = wav.shape[1] / 16000
+                    if dur < 1:
+                        duration_dict[1] += 1
+                    elif dur < 2:
+                        duration_dict[2] += 1
+                    elif dur < 4:
+                        duration_dict[4] += 1
+                    elif dur < 8:
+                        duration_dict[8] += 1
+                    elif dur < 12:
+                        duration_dict[12] += 1
+                    else:
+                        duration_dict[20] += 1
         print(duration_dict)
 if __name__ == "__main__":
     args = parser.parse_args()
