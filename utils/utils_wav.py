@@ -13,12 +13,15 @@ def truncate_wav(waveform, sr, duration):
     len_wav = waveform.shape[-1]
     dur_wav = len_wav / sr
     standard_len = int(duration * sr)
+    # if len_wav < standard_len:
+    #     times = standard_len // len_wav
+    #     waveform = waveform.repeat(1, times)
+    #     len_wav = len_wav * times
+    #     dummy=np.zeros((1,standard_len - len_wav))
+    #     extend_wav = np.concatenate((waveform,dummy), axis = 1)
     if len_wav < standard_len:
-        times = standard_len // len_wav
-        waveform = waveform.repeat(1, times)
-        len_wav = len_wav * times
-        dummy=np.zeros((1,standard_len - len_wav))
-        extend_wav = np.concatenate((waveform,dummy), axis = 1)
+        dummy = np.zeros((1, standard_len - len_wav))
+        extend_wav = np.concatenate((waveform, dummy), axis = 1)
     elif len_wav > standard_len:
         # extend_wav = waveform[:, :int(duration * sr)]
         indexes = get_random_index(len_wav, standard_len)
