@@ -85,14 +85,25 @@ class Emo_Raw_TDNN(nn.Module):
         self.cnn_frontend = CNN_frontend()
         
         self.tdnn1 = TDNN(input_dim=128, output_dim=128, context_size=3, dilation=1,dropout_p=0.5)
+        self.Q1 = torch.nn.Parameter(torch.zeros(128, 64, 128))
+        self.atten1 = nn.MultiheadAttention(embed_dim=128, num_heads=8)
+
         self.lstm1 = nn.LSTM(input_size=128, hidden_size=64,num_layers=1,bidirectional=True,dropout=0.5,batch_first=True)     
         
         self.tdnn2 = TDNN(input_dim=128, output_dim=128, context_size=7, dilation=3,dropout_p=0.5)
+        
         self.tdnn3 = TDNN(input_dim=128, output_dim=128, context_size=7, dilation=3,dropout_p=0.5)
+        self.Q2 = torch.nn.Parameter(torch.zeros(64, 64, 128))
+        self.atten2 = nn.MultiheadAttention(embed_dim=128, num_heads=8)
+
         self.lstm2 = nn.LSTM(input_size=128, hidden_size=64,num_layers=1,bidirectional=True,dropout=0.5,batch_first=True)     
         
         self.tdnn4 = TDNN(input_dim=128, output_dim=128, context_size=7, dilation=3,dropout_p=0.5)
+        
         self.tdnn5 = TDNN(input_dim=128, output_dim=128, context_size=7, dilation=3,dropout_p=0.5)
+        self.Q3 = torch.nn.Parameter(torch.zeros(32, 64, 128))
+        self.atten3 = nn.MultiheadAttention(embed_dim=128, num_heads=8)
+
         self.lstm3 = nn.LSTM(input_size=128, hidden_size=64,num_layers=1,bidirectional=True,dropout=0.5,batch_first=True)     
         self.multihead_attn = nn.MultiheadAttention(embed_dim=128, num_heads=8)
         self.fc = nn.Linear(2*128,num_classes)
@@ -100,25 +111,32 @@ class Emo_Raw_TDNN(nn.Module):
         
     def forward(self, inputs):
         cnn_out = self.cnn_frontend(inputs)
-        # print('frontend output shape:', cnn_out.shape) 
-        # 64 x 128 x 248
-        cnn_out = cnn_out.permute(0,2,1)
-        tdnn1_out = self.tdnn1(cnn_out)
-        lstm1_out, (final_hidden_state, final_cell_state) = self.lstm1(tdnn1_out)
+        cnn_out = cnn_out.permute(0, 2, 1)
+        # 64 x 248 x 128
+        cnn_out = cnn_out.permute(1, 0, 2)
+        atten1_out = self.atten1(self.Q1, cnn_out, cnn_out)
+        atten1_out = atten1_out.permute(1, 0, 2)
+        lstm1_out, _ = self.lstm1(atten1_out)
+        print('lstm1 out', lstm1_out.shape)
 
-        tdnn2_out = self.tdnn2(lstm1_out)
-        tdnn3_out = self.tdnn3(tdnn2_out)
-        lstm2_out, (final_hidden_state, final_cell_state) = self.lstm2(tdnn3_out)
+        # 64 x 128 x 128
+        lstm1_out = lstm1_out.permute(1, 0, 2)
+        atten2_out = self.atten2(self.Q2, lstm1_out, lstm1_out)
+        atten2_out = atten2_out.permute(1, 0, 2)
+        lstm2_out = self.lstm2(atten2_out)
+        print('lstm2 out', lstm2_out.shape)
 
-        tdnn4_out = self.tdnn4(lstm2_out)
-        tdnn5_out = self.tdnn5(tdnn4_out)
-        lstm3_out, (final_hidden_state, final_cell_state) = self.lstm3(tdnn5_out)
+        # 64 x 64  x 128
+        lstm2_out = lstm2_out.permute(1, 0, 2)
+        atten3_out = self.atten3(self.Q3, lstm2_out, lstm2_out)
+        atten3_out = atten3_out.permute(1, 0, 2)
+        lstm3_out = self.lstm3(atten3_out)
+        print('lstm3 out', lstm3_out.shape)
 
+        # 64 x 32 x 128
         lstm3_out = lstm3_out.permute(1, 0, 2)
-        lstm3_out, _ = self.multihead_attn(lstm3_out, lstm3_out, lstm3_out)
-        lstm3_out = lstm3_out.permute(1, 0, 2) 
-        # print('attention shape: ', lstm3_out.shape)
-
+        lstm3_out = self.multihead_attn(lstm3_out, lstm3_out, lstm3_out)
+        lstm3_out = lstm3_out.permute(1, 0, 2)
         ### Stat Pool
         mean = torch.mean(lstm3_out,1)
         # print('mean shape: ', mean.shape)
