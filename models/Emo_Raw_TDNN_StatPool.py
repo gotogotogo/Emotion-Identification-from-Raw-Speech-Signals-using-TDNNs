@@ -101,7 +101,7 @@ class Emo_Raw_TDNN(nn.Module):
         self.tdnn4 = TDNN(input_dim=128, output_dim=128, context_size=7, dilation=3,dropout_p=0.5)
         
         self.tdnn5 = TDNN(input_dim=128, output_dim=128, context_size=7, dilation=3,dropout_p=0.5)
-        self.Q3 = torch.nn.Parameter(torch.zeros(32, 64, 128))
+        self.Q3 = torch.nn.Parameter(torch.zeros(64, 64, 128))
         self.atten3 = nn.MultiheadAttention(embed_dim=128, num_heads=8)
 
         self.lstm3 = nn.LSTM(input_size=128, hidden_size=64,num_layers=1,bidirectional=True,dropout=0.5,batch_first=True)     
