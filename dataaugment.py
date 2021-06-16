@@ -8,7 +8,6 @@ from tqdm import tqdm
 def augment(wav_files_pkl, duration=8):
     with open(wav_files_pkl, 'rb') as f:
         data_dict = pickle.load(f)
-    print('load wav collect files successfully!')
     data_aug = []
     for session in tqdm(data_dict):
         for wav_name in tqdm(data_dict[session]):
@@ -45,7 +44,5 @@ def amplitude_modulate(waveform, min_gain_db=-12, max_gain_db=12, size=10):
         result.append(waveform * amplitude[i])
     return result
 
-if __name__ == "__mian__":
-    print('start')
+if __name__ == "__main__":
     augment('wav_collect_files.pkl')
-    print('end')
