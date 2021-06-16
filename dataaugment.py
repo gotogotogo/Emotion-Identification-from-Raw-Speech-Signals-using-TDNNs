@@ -3,14 +3,15 @@ import torchaudio
 from torchaudio.transforms import Resample
 import random
 from utils import utils_wav
+from tqdm import tqdm
 
 def augment(wav_files_pkl, duration=8):
     with open(wav_files_pkl, 'rb') as f:
         data_dict = pickle.load(f)
     print('load wav collect files successfully!')
     data_aug = []
-    for session in data_dict:
-        for wav_name in data_dict[session]:
+    for session in tqdm(data_dict):
+        for wav_name in tqdm(data_dict[session]):
             waveform, sr = torchaudio.load(data_dict[session][wav_name]['wav_path'])
             resamples = resample(waveform)
             for i in range(len(resamples)):
@@ -25,6 +26,7 @@ def augment(wav_files_pkl, duration=8):
                     data_aug.append({'wav_path': path, 'emotion': emotion, 'gender': gender})
     with open('augment_wav_files_pkl', 'wb') as f:
         pickle.dump(data_aug, f)
+
 def resample(waveform):
     resample1 = Resample(16000, 16000 * 0.9)
     resample2 = Resample(16000, 16000 * 1.0)
@@ -44,4 +46,6 @@ def amplitude_modulate(waveform, min_gain_db=-12, max_gain_db=12, size=10):
     return result
 
 if __name__ == "__mian__":
+    print('start')
     augment('wav_collect_files.pkl')
+    print('end')
