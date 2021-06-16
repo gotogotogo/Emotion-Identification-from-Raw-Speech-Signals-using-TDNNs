@@ -13,6 +13,13 @@ parser.add_argument('--raw_path', type=str, default='F:/IEMOCAP')
 emotion_id = {'hap': 0, 'exc': 0, 'ang': 1, 'sad': 2, 'neu': 3}
 gender_id = {'M':0,'F':1}
 def collect_files(root_path):
+    '''
+    data_dict:{
+        'Session1': wave_name:{'wav_path': , 'emotion': , 'gender': },
+        ......
+        'Session5': wave_name:{'wav_path': , 'emotion': , 'gender': },
+    }
+    '''
     data_dict = {}
     for speaker in tqdm(os.listdir(root_path)):
         data_dict[speaker] = {}
