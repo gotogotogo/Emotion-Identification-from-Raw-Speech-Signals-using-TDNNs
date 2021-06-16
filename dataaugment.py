@@ -41,7 +41,7 @@ def amplitude_modulate(waveform, min_gain_db=-12, max_gain_db=12, size=10):
     for i in range(size):
         amplitude = random.uniform(min_gain_db, max_gain_db)
         amplitude = 10 ** (amplitude / 20)
-        result.append(waveform * amplitude[i])
+        result.append(waveform * amplitude)
     return result
 
 if __name__ == "__main__":
