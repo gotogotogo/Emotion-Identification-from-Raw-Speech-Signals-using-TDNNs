@@ -16,13 +16,13 @@ def augment(wav_files_pkl, duration=8):
             for i in range(len(resamples)):
                 amplitudes = amplitude_modulate(resamples[i])
                 for j in range(len(amplitudes)):
-                    x = utils_wav.truncate_wav(amplitudes[j], sr, duration=duration)
+                    extend_wav, dur = utils_wav.truncate_wav(amplitudes[j], sr, duration=duration)
                     path = 'data/' + wav_name + '_' + str(i) + '_' + str(j) + '.pkl'
                     emotion = data_dict[session][wav_name]['emotion']
                     gender = data_dict[session][wav_name]['gender']
                     with open(path, 'wb') as f:
-                        pickle.dump(x, f)
-                    data_aug.append({'wav_path': path, 'emotion': emotion, 'gender': gender})
+                        pickle.dump(extend_wav, f)
+                    data_aug.append({'wav_path': path, 'emotion': emotion, 'gender': gender, 'duration': dur})
     with open('augment_wav_files_pkl', 'wb') as f:
         pickle.dump(data_aug, f)
 

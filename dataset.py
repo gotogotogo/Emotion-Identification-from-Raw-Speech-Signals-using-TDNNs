@@ -12,66 +12,37 @@ from utils import utils_wav
 class CustomDataset(Dataset):
     def __init__(self, wav_files_pkl, mode, test_sess):
         self.mode = mode
-        with open(wav_files_pkl, 'rb') as f:
-            data_dict = pickle.load(f)
-        self.wav_paths = []
-        self.labels = []
-        self.gender_labels = []
-        self.aug_data = []
-        self.aug_labels = []
-        self.aug_duration = []
         if self.mode == 'train':
+            with open('augment_wav_files_pkl', 'rb') as f:
+                self.data = pickle.load(f)
+            
+        elif self.mode == 'test':
+            self.data = []
+            with open(wav_files_pkl, 'rb') as f:
+                data_dict = pickle.load(f)
             for session in data_dict:
                 if session[-1] != str(test_sess):
                     for wav_name in data_dict[session]:
-                        self.wav_paths.append(data_dict[session][wav_name]['wav_path'])
-                        self.labels.append(data_dict[session][wav_name]['emotion'])
-                        self.gender_labels.append(data_dict[session][wav_name]['gender'])
-
-            self.resample1 = Resample(16000, 16000 * 0.9)
-            self.resample2 = Resample(16000, 16000 * 1.0)
-            self.resample3 = Resample(16000, 16000 * 1.1)
-            for i in range(len(self.wav_paths)):
-                waveform, sr = torchaudio.load(self.wav_paths[i])
-                self.aug_data.append(utils_wav.truncate_wav(self.resample1(waveform), sr, 8)[0])
-                self.aug_labels.append(self.labels[i])
-                self.aug_duration.append(1)
-                self.aug_data.append(utils_wav.truncate_wav(self.resample2(waveform), sr, 8)[0])
-                self.aug_labels.append(self.labels[i])
-                self.aug_duration.append(1)
-                self.aug_data.append(utils_wav.truncate_wav(self.resample3(waveform), sr, 8)[0])
-                self.aug_labels.append(self.labels[i])
-                self.aug_duration.append(1)
-        elif self.mode == 'test':
-            for session in data_dict:
-                if session[-1] == str(test_sess):
-                    for wav_name in data_dict[session]:
-                        self.wav_paths.append(data_dict[session][wav_name]['wav_path'])
-                        self.labels.append(data_dict[session][wav_name]['emotion'])
-                        self.gender_labels.append(data_dict[session][wav_name]['gender'])
-            for i in range(len(self.wav_paths)):
-                waveform, sr = torchaudio.load(self.wav_paths[i])
-                extend_wav, duration = utils_wav.truncate_wav(waveform, sr, 8)
-                self.aug_data.append(extend_wav)
-                self.aug_labels.append(self.labels[i])
-                self.aug_duration.append(duration)
+                        wav_path = data_dict[session][wav_name]['wav_path']
+                        emotion = data_dict[session][wav_name]['emotion']
+                        gender = data_dict[session][wav_name]['gender']
+                        waveform, sr = torchaudio.load(wav_path)
+                        extend_wav, dur = utils_wav.truncate_wav(waveform, sr, duration=8)
+                        self.data.append({'wav': extend_wav, 'emotion': emotion, 'gender': gender, 'duration': dur})
         else:
             assert False, 'Wrong mode!'
-        
-        print(len(self.labels))
-        label_dict = {0: 'happy', 1: 'angry', 2: 'sad', 3: 'neutral'}
-        for i in range(4):
-            total = sum(np.array(self.labels) == i)
-            print(label_dict[i], total)
-        print(len(self.aug_labels))
 
     def __len__(self):
-        return len(self.aug_labels)
+        return len(self.data)
     
     def __getitem__(self, index):
-        extend_wav = self.aug_data[index]
-        label = self.aug_labels[index]
-        duration = self.aug_duration[index]
+        if self.mode == 'train':
+            with open(self.data[index]['wav_path'], 'rb') as f:
+                extend_wav = pickle.load(f)
+        elif self.mode == 'test':
+            extend_wav = self.data[index]['wav']
+        label = self.data[index]['emotion']
+        duration = self.data[index]['gender']
         sample = {
                 'raw_speech': torch.from_numpy(np.ascontiguousarray(extend_wav)), 
                 'labels': torch.from_numpy(np.ascontiguousarray(label)), 

@@ -11,7 +11,7 @@ def get_random_index(max_num, length):
 
 def truncate_wav(waveform, sr, duration):
     len_wav = waveform.shape[-1]
-    dur_wav = len_wav / sr
+    dur = len_wav / sr
     standard_len = int(duration * sr)
     # if len_wav < standard_len:
     #     times = standard_len // len_wav
@@ -29,7 +29,7 @@ def truncate_wav(waveform, sr, duration):
     else:
         extend_wav = waveform
 
-    return extend_wav, dur_wav
+    return extend_wav, dur
 
 def speed_perturbation():
     pass 
