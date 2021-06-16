@@ -17,7 +17,7 @@ def augment(wav_files_pkl, duration=8):
                 amplitudes = amplitude_modulate(resamples[i])
                 for j in range(len(amplitudes)):
                     x = utils_wav.truncate_wav(amplitudes[j], sr, duration=duration)
-                    path = 'data/' + wav_name + '_' + str(i) + '_' + 'j' + '.pkl'
+                    path = 'data/' + wav_name + '_' + str(i) + '_' + str(j) + '.pkl'
                     emotion = data_dict[session][wav_name]['emotion']
                     gender = data_dict[session][wav_name]['gender']
                     with open(path, 'wb') as f:
