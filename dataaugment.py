@@ -7,6 +7,7 @@ from utils import utils_wav
 def augment(wav_files_pkl, duration=8):
     with open(wav_files_pkl, 'rb') as f:
         data_dict = pickle.load(f)
+    print('load wav collect files successfully!')
     data_aug = []
     for session in data_dict:
         for wav_name in data_dict[session]:
