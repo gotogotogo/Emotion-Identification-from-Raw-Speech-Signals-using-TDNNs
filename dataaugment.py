@@ -3,7 +3,7 @@ import torchaudio
 from torchaudio.transforms import Resample
 import random
 from utils import utils_wav
-from tqdm.auto import tqdm
+from tqdm.notebook import tqdm
 
 def augment(wav_files_pkl, duration=8):
     with open(wav_files_pkl, 'rb') as f:
