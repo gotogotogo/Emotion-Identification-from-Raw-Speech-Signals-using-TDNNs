@@ -9,20 +9,22 @@ def augment(wav_files_pkl, duration=8):
     with open(wav_files_pkl, 'rb') as f:
         data_dict = pickle.load(f)
     data_aug = []
-    for session in tqdm(data_dict):
-        for wav_name in tqdm(data_dict[session]):
-            waveform, sr = torchaudio.load(data_dict[session][wav_name]['wav_path'])
-            resamples = resample(waveform)
-            for i in range(len(resamples)):
-                amplitudes = amplitude_modulate(resamples[i])
-                for j in range(len(amplitudes)):
-                    extend_wav, dur = utils_wav.truncate_wav(amplitudes[j], sr, duration=duration)
-                    path = 'data/' + wav_name + '_' + str(i) + '_' + str(j) + '.pkl'
-                    emotion = data_dict[session][wav_name]['emotion']
-                    gender = data_dict[session][wav_name]['gender']
-                    with open(path, 'wb') as f:
-                        pickle.dump(extend_wav, f)
-                    data_aug.append({'wav_path': path, 'emotion': emotion, 'gender': gender, 'duration': dur})
+    with tqdm(data_dict) as t:
+        for session in t:
+            with (tqdm(t[session])) as t2:
+                for wav_name in t2:
+                    waveform, sr = torchaudio.load(data_dict[session][wav_name]['wav_path'])
+                    resamples = resample(waveform)
+                    for i in range(len(resamples)):
+                        amplitudes = amplitude_modulate(resamples[i])
+                        for j in range(len(amplitudes)):
+                            extend_wav, dur = utils_wav.truncate_wav(amplitudes[j], sr, duration=duration)
+                            path = 'data/' + wav_name + '_' + str(i) + '_' + str(j) + '.pkl'
+                            emotion = data_dict[session][wav_name]['emotion']
+                            gender = data_dict[session][wav_name]['gender']
+                            with open(path, 'wb') as f:
+                                pickle.dump(extend_wav, f)
+                            data_aug.append({'wav_path': path, 'emotion': emotion, 'gender': gender, 'duration': dur})
     with open('augment_wav_files_pkl', 'wb') as f:
         pickle.dump(data_aug, f)
 
