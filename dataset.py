@@ -23,7 +23,7 @@ class CustomDataset(Dataset):
             for session in data_dict:
                 if session[-1] != str(test_sess):
                     for wav_name in data_dict[session]:
-                        wav_path = '/input/' + data_dict[session][wav_name]['wav_path']
+                        wav_path = data_dict[session][wav_name]['wav_path']
                         emotion = data_dict[session][wav_name]['emotion']
                         gender = data_dict[session][wav_name]['gender']
                         waveform, sr = torchaudio.load(wav_path)
