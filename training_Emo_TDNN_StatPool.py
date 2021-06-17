@@ -52,10 +52,10 @@ class Cross_Entropy_Loss_Label_Smooth(nn.Module):
 
 ### Data related
 dataset_train = CustomDataset(args.wav_files_collect_path, mode='train', test_sess=5)
-dataloader_train = DataLoader(dataset_train, batch_size=args.batch_size, shuffle=True, drop_last=True, collate_fn=speech_collate, num_workers=15)  
+dataloader_train = DataLoader(dataset_train, batch_size=args.batch_size, shuffle=True, drop_last=True, collate_fn=speech_collate, num_workers=15, pin_memory=True)  
 
 dataset_test = CustomDataset(args.wav_files_collect_path, mode='test', test_sess=5)
-dataloader_test = DataLoader(dataset_test, batch_size=args.batch_size, shuffle=True, drop_last=True, collate_fn=speech_collate, num_workers=15)  
+dataloader_test = DataLoader(dataset_test, batch_size=args.batch_size, shuffle=True, drop_last=True, collate_fn=speech_collate, num_workers=15, pin_memory=True)  
 
 ## Model related
 use_cuda = torch.cuda.is_available()
