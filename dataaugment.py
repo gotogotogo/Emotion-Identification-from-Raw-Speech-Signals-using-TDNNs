@@ -4,8 +4,11 @@ from torchaudio.transforms import Resample
 import random
 from utils import utils_wav
 from tqdm.auto import tqdm
+import argparse
 
-def augment(wav_files_pkl, duration=8):
+parser = argparse.ArgumentParser(add_help=False)
+parser.add_argument('--data_path', type=str, default='data/')
+def augment(wav_files_pkl, data_path, duration=8):
     with open(wav_files_pkl, 'rb') as f:
         data_dict = pickle.load(f)
     data_aug = []
@@ -18,7 +21,7 @@ def augment(wav_files_pkl, duration=8):
                     amplitudes = amplitude_modulate(resamples[i])
                     for j in range(len(amplitudes)):
                         extend_wav, dur = utils_wav.truncate_wav(amplitudes[j], sr, duration=duration)
-                        path = 'data/' + wav_name + '_' + str(i) + '_' + str(j) + '.pkl'
+                        path = data_path + wav_name + '_' + str(i) + '_' + str(j) + '.pkl'
                         emotion = data_dict[session][wav_name]['emotion']
                         gender = data_dict[session][wav_name]['gender']
                         with open(path, 'wb') as f:
@@ -46,4 +49,5 @@ def amplitude_modulate(waveform, min_gain_db=-12, max_gain_db=12, size=10):
     return result
 
 if __name__ == "__main__":
-    augment('wav_collect_files.pkl')
+    args = parser.parse_args()
+    augment('wav_collect_files.pkl', args.data_path)
