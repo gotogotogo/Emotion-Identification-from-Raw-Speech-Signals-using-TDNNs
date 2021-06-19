@@ -85,7 +85,7 @@ def train(train_loader,epoch):
         print('labels shape', labels.shape)
         print(type(labels))
         features = features.float().to(device)
-        labels = labels.to(device)
+        labels = labels.to(device).squeeze().long()
         features.requires_grad = True
         optimizer.zero_grad()
         pred_logits = model(features)
@@ -128,7 +128,7 @@ def test(test_loader,epoch, best_acc, target_names):
             print('durations shape', durations.shape)
             print(type(durations))
             features = features.to(device)
-            labels = labels.to(device)
+            labels = labels.to(device).squeeze().long()
             durations = durations.to(device)
             pred_logits = model(features)
             #### CE loss
