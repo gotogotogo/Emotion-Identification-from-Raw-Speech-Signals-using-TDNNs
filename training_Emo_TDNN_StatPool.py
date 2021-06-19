@@ -80,6 +80,12 @@ def train(train_loader,epoch):
         # features = torch.from_numpy(np.asarray([torch_tensor.numpy() for torch_tensor in features])).float()         
         # labels = torch.from_numpy(np.asarray([torch_tensor[0].numpy() for torch_tensor in labels]))
         #print(labels.shape)
+        print('features shape', features.shape)
+        print(type(features))
+        print('labels shape', labels.shape)
+        print(type(labels))
+        print('durations shape', durations.shape)
+        print(type(durations))
         features = features.float().to(device)
         labels = labels.float().to(device)
         features.requires_grad = True
