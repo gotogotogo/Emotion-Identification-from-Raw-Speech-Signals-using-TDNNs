@@ -53,10 +53,10 @@ class Cross_Entropy_Loss_Label_Smooth(nn.Module):
 
 ### Data related
 dataset_train = CustomDataset(args.raw_wav_path, mode='train', test_sess=5, duration=8)
-dataloader_train = DataLoader(dataset_train, batch_size=args.batch_size, shuffle=True, drop_last=True, collate_fn=speech_collate, num_workers=8, pin_memory=True)  
+dataloader_train = DataLoader(dataset_train, batch_size=args.batch_size, shuffle=True, drop_last=True, num_workers=8, pin_memory=True)  
 
 dataset_test = CustomDataset(args.raw_wav_path, mode='test', test_sess=5, duration=8)
-dataloader_test = DataLoader(dataset_test, batch_size=args.batch_size, shuffle=False, drop_last=True, collate_fn=speech_collate, num_workers=8, pin_memory=True)  
+dataloader_test = DataLoader(dataset_test, batch_size=args.batch_size, shuffle=False, drop_last=True, num_workers=8, pin_memory=True)  
 
 ## Model related
 use_cuda = torch.cuda.is_available()
@@ -112,11 +112,12 @@ def test(test_loader,epoch, best_acc, target_names):
         val_loss_list=[]
         full_preds=[]
         full_gts=[]
-        for i_batch, sample_batched in enumerate(test_loader):
-            features = torch.from_numpy(np.asarray([torch_tensor.numpy() for torch_tensor in sample_batched[0]])).float()
-            labels = torch.from_numpy(np.asarray([torch_tensor[0].numpy() for torch_tensor in sample_batched[1]]))
-            durations = torch.from_numpy(np.asarray([torch_tensor[0].numpy() for torch_tensor in sample_batched[2]]))
-            features, labels = features.to(device),labels.to(device)
+        for i_batch, (features, labels, durations) in enumerate(test_loader):
+            # features = torch.from_numpy(np.asarray([torch_tensor.numpy() for torch_tensor in sample_batched[0]])).float()
+            # labels = torch.from_numpy(np.asarray([torch_tensor[0].numpy() for torch_tensor in sample_batched[1]]))
+            # durations = torch.from_numpy(np.asarray([torch_tensor[0].numpy() for torch_tensor in sample_batched[2]]))
+            features = features.to(device)
+            labels = labels.float().to(device)
             durations = durations.to(device)
             pred_logits = model(features)
             #### CE loss

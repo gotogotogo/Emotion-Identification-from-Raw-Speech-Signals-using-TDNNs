@@ -32,11 +32,12 @@ class CustomDataset(Dataset):
         if self.mode == 'train':
             extend_wav = augment(waveform, self.duration)
         elif self.mode == 'test':
-            extend_wav = waveform
+            extend_wav = waveform.resha
         label = self.data[index]['emotion']
         duration = self.data[index]['duration']
-        sample = {
-                'waveform': torch.from_numpy(np.ascontiguousarray(extend_wav)), 
-                'label': torch.from_numpy(np.ascontiguousarray(label)), 
-                'duration': torch.from_numpy(np.ascontiguousarray(duration))}
-        return sample
+        # sample = {
+        #         'waveform': torch.from_numpy(np.ascontiguousarray(extend_wav)), 
+        #         'label': torch.from_numpy(np.ascontiguousarray(label)), 
+        #         'duration': torch.from_numpy(np.ascontiguousarray(duration))}
+        # return sample
+        return extend_wav, label, duration
