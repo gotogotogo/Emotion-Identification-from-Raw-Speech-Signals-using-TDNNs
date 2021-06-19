@@ -35,9 +35,8 @@ class CustomDataset(Dataset):
             extend_wav = waveform.resha
         label = self.data[index]['emotion']
         duration = self.data[index]['duration']
-        # sample = {
-        #         'waveform': torch.from_numpy(np.ascontiguousarray(extend_wav)), 
-        #         'label': torch.from_numpy(np.ascontiguousarray(label)), 
-        #         'duration': torch.from_numpy(np.ascontiguousarray(duration))}
-        # return sample
-        return extend_wav, label, duration
+        sample = {
+                'waveform': torch.from_numpy(np.ascontiguousarray(extend_wav)), 
+                'label': torch.from_numpy(np.ascontiguousarray(label)), 
+                'duration': torch.from_numpy(np.ascontiguousarray(duration))}
+        return sample

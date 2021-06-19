@@ -53,10 +53,10 @@ class Cross_Entropy_Loss_Label_Smooth(nn.Module):
 
 ### Data related
 dataset_train = CustomDataset(args.raw_wav_path, mode='train', test_sess=5, duration=8)
-dataloader_train = DataLoader(dataset_train, batch_size=args.batch_size, shuffle=True, drop_last=True, num_workers=8, pin_memory=True)  
+dataloader_train = DataLoader(dataset_train, batch_size=args.batch_size, collate_fn=speech_collate, shuffle=True, drop_last=True, num_workers=8, pin_memory=True)  
 
 dataset_test = CustomDataset(args.raw_wav_path, mode='test', test_sess=5, duration=8)
-dataloader_test = DataLoader(dataset_test, batch_size=args.batch_size, shuffle=False, drop_last=True, num_workers=8, pin_memory=True)  
+dataloader_test = DataLoader(dataset_test, batch_size=args.batch_size, collate_fn=speech_collate, shuffle=False, drop_last=True, num_workers=8, pin_memory=True)  
 
 ## Model related
 use_cuda = torch.cuda.is_available()
@@ -77,15 +77,12 @@ def train(train_loader,epoch):
     train_loader = tqdm(train_loader)
     for step, (features, labels, _) in enumerate(train_loader):
         #print(features.shape)
-        # features = torch.from_numpy(np.asarray([torch_tensor.numpy() for torch_tensor in features])).float()         
-        # labels = torch.from_numpy(np.asarray([torch_tensor[0].numpy() for torch_tensor in labels]))
+        features = torch.from_numpy(np.asarray([torch_tensor.numpy() for torch_tensor in features])).float()         
+        labels = torch.from_numpy(np.asarray([torch_tensor[0].numpy() for torch_tensor in labels]))
         #print(labels.shape)
-        print('features shape', features.shape)
-        print(type(features))
         print('labels shape', labels.shape)
-        print(type(labels))
-        features = features.float().to(device)
-        labels = labels.to(device).squeeze().long()
+        features = features.to(device)
+        labels = labels.to(device)
         features.requires_grad = True
         optimizer.zero_grad()
         pred_logits = model(features)
@@ -121,14 +118,10 @@ def test(test_loader,epoch, best_acc, target_names):
             # features = torch.from_numpy(np.asarray([torch_tensor.numpy() for torch_tensor in sample_batched[0]])).float()
             # labels = torch.from_numpy(np.asarray([torch_tensor[0].numpy() for torch_tensor in sample_batched[1]]))
             # durations = torch.from_numpy(np.asarray([torch_tensor[0].numpy() for torch_tensor in sample_batched[2]]))
-            print('features shape', features.shape)
-            print(type(features))
-            print('labels shape', labels.shape)
-            print(type(labels))
             print('durations shape', durations.shape)
             print(type(durations))
             features = features.to(device)
-            labels = labels.to(device).squeeze().long()
+            labels = labels.to(device)
             durations = durations.to(device)
             pred_logits = model(features)
             #### CE loss
