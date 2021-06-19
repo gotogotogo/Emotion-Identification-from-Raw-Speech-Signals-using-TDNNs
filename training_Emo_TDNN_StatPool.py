@@ -81,7 +81,7 @@ def train(train_loader,epoch):
         # labels = torch.from_numpy(np.asarray([torch_tensor[0].numpy() for torch_tensor in labels]))
         #print(labels.shape)
         features = features.float().to(device)
-        labels = labels.to(device)
+        labels = torch.from_numpy(labels).float().to(device)
         features.requires_grad = True
         optimizer.zero_grad()
         pred_logits = model(features)
@@ -118,8 +118,8 @@ def test(test_loader,epoch, best_acc, target_names):
             # labels = torch.from_numpy(np.asarray([torch_tensor[0].numpy() for torch_tensor in sample_batched[1]]))
             # durations = torch.from_numpy(np.asarray([torch_tensor[0].numpy() for torch_tensor in sample_batched[2]]))
             features = features.to(device)
-            labels = labels.float().to(device)
-            durations = durations.to(device)
+            labels = torch.from_numpy(labels).float().to(device)
+            durations = torch.from_numpy(durations).to(device)
             pred_logits = model(features)
             #### CE loss
             loss = loss_fun(pred_logits,labels)
