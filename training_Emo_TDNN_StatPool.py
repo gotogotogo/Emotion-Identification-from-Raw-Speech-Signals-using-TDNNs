@@ -84,8 +84,6 @@ def train(train_loader,epoch):
         print(type(features))
         print('labels shape', labels.shape)
         print(type(labels))
-        print('durations shape', durations.shape)
-        print(type(durations))
         features = features.float().to(device)
         labels = labels.float().to(device)
         features.requires_grad = True
