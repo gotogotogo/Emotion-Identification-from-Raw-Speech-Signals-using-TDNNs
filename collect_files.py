@@ -41,6 +41,7 @@ def collect_files(root_path):
                 #print(file_name)
                 wave_name = file_name.split('/')[-1][:-4]
                 waveform, _ = torchaudio.load(file_name)
+                waveform = waveform.reshape(-1, 1)
                 #print(wave_name)
                 emotion = label_list[wave_name]
                 if emotion in ['ang', 'sad', 'neu', 'exc', 'hap']:
