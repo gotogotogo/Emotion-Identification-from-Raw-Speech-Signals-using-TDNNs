@@ -15,14 +15,14 @@ gender_id = {'M':0,'F':1}
 def collect_files(root_path):
     '''
     data_dict:{
-        'Session1': wave_name:{'wav_path': , 'emotion': , 'gender': },
+        'Session1': [{'wav': wav, 'emotion': emotion, 'gender': gender, 'duration': duration},...],
         ......
-        'Session5': wave_name:{'wav_path': , 'emotion': , 'gender': },
+        'Session5': [{'wav': wav, 'emotion': emotion, 'gender': gender, 'duration': duration},...],
     }
     '''
     data_dict = {}
     for speaker in tqdm(os.listdir(root_path)):
-        data_dict[speaker] = {}
+        data_dict[speaker] = []
         wav_dir =  os.path.join(root_path, speaker, 'sentences/wav')
         emo_dir = os.path.join(root_path, speaker, 'dialog/EmoEvaluation')
         for sess in os.listdir(wav_dir):
@@ -40,21 +40,19 @@ def collect_files(root_path):
             for file_name in files:
                 #print(file_name)
                 wave_name = file_name.split('/')[-1][:-4]
+                waveform, _ = torchaudio.load(file_name)
                 #print(wave_name)
                 emotion = label_list[wave_name]
                 if emotion in ['ang', 'sad', 'neu', 'exc', 'hap']:
-                    data_dict[speaker][wave_name] = {}
-                    data_dict[speaker][wave_name]['wav_path'] = file_name
-                    data_dict[speaker][wave_name]['emotion'] = emotion_id[emotion]
-                    data_dict[speaker][wave_name]['gender'] = gender_id[wave_name[5]]
-    for s in data_dict:
-        print('len of s: ', len(data_dict[s]))
-    with open('wav_collect_files.pkl', 'wb') as f:
+                    data_dict[speaker].append({'wav': waveform, 'emotion': emotion_id[emotion], 'gender': gender_id[wave_name[5]], 'duration': waveform.shape[1] / 16000})
+        print('len of ', speaker, ' :', len(data_dict[speaker]))
+    with open('raw_wavs.pkl', 'wb') as f:
         pickle.dump(data_dict, f)
-        print('successfully collect wav files')           
+    print('successfully collect wav files')           
+
 
 def collect_durations():
-    with open('wav_collect_files.pkl', 'rb') as f:         
+    with open('raw_wavs.pkl', 'rb') as f:         
         data_dict = pickle.load(f)
         duration_dict = {}
         duration_dict[1] = 0
@@ -62,12 +60,11 @@ def collect_durations():
         duration_dict[4] = 0
         duration_dict[8] = 0
         duration_dict[12] = 0
-        duration_dict[20] = 0
+        duration_dict['gt_12'] = 0
         for speaker in data_dict:
             if speaker[-1] == '5':
-                for wave_name in data_dict[speaker]:
-                    wav, _ = torchaudio.load(data_dict[speaker][wave_name]['wav_path'])
-                    dur = wav.shape[1] / 16000
+                for i in range(len(data_dict[speaker])):
+                    dur = data_dict[speaker][i]['duration']
                     if dur < 1:
                         duration_dict[1] += 1
                     elif dur < 2:
@@ -79,7 +76,7 @@ def collect_durations():
                     elif dur < 12:
                         duration_dict[12] += 1
                     else:
-                        duration_dict[20] += 1
+                        duration_dict['gt_12'] += 1
         print(duration_dict)
 if __name__ == "__main__":
     args = parser.parse_args()
