@@ -80,7 +80,7 @@ def train(train_loader,epoch):
         features = torch.from_numpy(np.asarray([torch_tensor.numpy() for torch_tensor in features])).float()         
         labels = torch.from_numpy(np.asarray([torch_tensor[0].numpy() for torch_tensor in labels]))
         #print(labels.shape)
-        print('labels shape', labels.shape)
+        # print('labels shape', labels.shape)
         features = features.to(device)
         labels = labels.to(device)
         features.requires_grad = True
@@ -115,9 +115,9 @@ def test(test_loader,epoch, best_acc, target_names):
         full_preds=[]
         full_gts=[]
         for i_batch, (features, labels, durations) in enumerate(test_loader):
-            # features = torch.from_numpy(np.asarray([torch_tensor.numpy() for torch_tensor in sample_batched[0]])).float()
-            # labels = torch.from_numpy(np.asarray([torch_tensor[0].numpy() for torch_tensor in sample_batched[1]]))
-            # durations = torch.from_numpy(np.asarray([torch_tensor[0].numpy() for torch_tensor in sample_batched[2]]))
+            features = torch.from_numpy(np.asarray([torch_tensor.numpy() for torch_tensor in features])).float()
+            labels = torch.from_numpy(np.asarray([torch_tensor[0].numpy() for torch_tensor in labels]))
+            durations = torch.from_numpy(np.asarray([torch_tensor[0].numpy() for torch_tensor in durations]))
             print('durations shape', durations.shape)
             print(type(durations))
             features = features.to(device)
