@@ -10,7 +10,7 @@ def get_random_index(max_num, length):
     indexes.sort()
     return indexes
 
-def truncate_wav(waveform, duration, sr=16000):
+def truncate(waveform, duration, sr=16000):
     '''
         truncate waveform to the specified time duration 
         return :
