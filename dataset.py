@@ -3,7 +3,7 @@ import torch
 from torch.utils.data import Dataset 
 import numpy as np
 import pickle
-from utils.utils_wav import augment
+from utils.utils_wav import augment, truncate
 
 
 class CustomDataset(Dataset):
@@ -32,7 +32,7 @@ class CustomDataset(Dataset):
         if self.mode == 'train':
             extend_wav = augment(waveform, self.duration)
         elif self.mode == 'test':
-            extend_wav = waveform.resha
+            extend_wav = truncate(waveform, self.duration)
         label = self.data[index]['emotion']
         duration = self.data[index]['duration']
         sample = {
