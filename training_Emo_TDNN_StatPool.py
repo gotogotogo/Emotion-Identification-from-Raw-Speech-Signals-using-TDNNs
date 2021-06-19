@@ -5,31 +5,32 @@ Created on Sat May 30 20:22:26 2020
 
 @author: krishna
 """
-
 import torch
-import numpy as np
-from torch.utils.data import DataLoader   
-from dataset import CustomDataset
 import torch.nn as nn
-import os
-from torch import optim
-import argparse
-from models.Emo_Raw_TDNN_StatPool import Emo_Raw_TDNN
-from sklearn.metrics import balanced_accuracy_score, classification_report, confusion_matrix
-from utils.utils_wav import speech_collate
 import torch.nn.functional as F
-torch.multiprocessing.set_sharing_strategy('file_system')
+from torch import optim
+from torch.utils.data import DataLoader
+
+from dataset import CustomDataset
+from utils.utils_wav import speech_collate
+from models.Emo_Raw_TDNN_StatPool import Emo_Raw_TDNN
+
+import os
+import argparse
+import numpy as np
 from tqdm import tqdm
+from sklearn.metrics import balanced_accuracy_score, classification_report, confusion_matrix
+
 import warnings
 warnings.filterwarnings('ignore')
+torch.multiprocessing.set_sharing_strategy('file_system')
 
 ########## Argument parser
 parser = argparse.ArgumentParser(add_help=False)
-parser.add_argument('--wav_files_collect_path', type=str, default='wav_collect_files.pkl')
+parser.add_argument('--raw_wav_path', type=str, default='raw_wavs.pkl')
 
 parser.add_argument('-input_dim', action="store_true", default=1)
 parser.add_argument('-num_classes', action="store_true", default=4)
-parser.add_argument('-lamda_val', action="store_true", default=0.1)
 parser.add_argument('-batch_size', action="store_true", default=64)
 parser.add_argument('-use_gpu', action="store_true", default=True)
 parser.add_argument('-num_epochs', action="store_true", default=1000)
@@ -51,11 +52,11 @@ class Cross_Entropy_Loss_Label_Smooth(nn.Module):
         return loss 
 
 ### Data related
-dataset_train = CustomDataset(args.wav_files_collect_path, mode='train', test_sess=5)
-dataloader_train = DataLoader(dataset_train, batch_size=args.batch_size, shuffle=True, drop_last=True, collate_fn=speech_collate, num_workers=15, pin_memory=True)  
+dataset_train = CustomDataset(args.raw_wav_path, mode='train', test_sess=5, duration=8)
+dataloader_train = DataLoader(dataset_train, batch_size=args.batch_size, shuffle=True, drop_last=True, collate_fn=speech_collate, num_workers=8, pin_memory=True)  
 
-dataset_test = CustomDataset(args.wav_files_collect_path, mode='test', test_sess=5)
-dataloader_test = DataLoader(dataset_test, batch_size=args.batch_size, shuffle=True, drop_last=True, collate_fn=speech_collate, num_workers=15, pin_memory=True)  
+dataset_test = CustomDataset(args.raw_wav_path, mode='test', test_sess=5, duration=8)
+dataloader_test = DataLoader(dataset_test, batch_size=args.batch_size, shuffle=False, drop_last=True, collate_fn=speech_collate, num_workers=8, pin_memory=True)  
 
 ## Model related
 use_cuda = torch.cuda.is_available()
