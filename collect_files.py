@@ -45,7 +45,7 @@ def collect_files(root_path):
                 #print(wave_name)
                 emotion = label_list[wave_name]
                 if emotion in ['ang', 'sad', 'neu', 'exc', 'hap']:
-                    data_dict[speaker].append({'wav': waveform, 'emotion': torch.tensor(emotion_id[emotion]), 'gender': gender_id[wave_name[5]], 'duration': waveform.shape[1] / 16000})
+                    data_dict[speaker].append({'wav': waveform, 'emotion': emotion_id[emotion], 'gender': gender_id[wave_name[5]], 'duration': waveform.shape[1] / 16000})
         print('len of ', speaker, ' :', len(data_dict[speaker]))
     with open('raw_wavs.pkl', 'wb') as f:
         pickle.dump(data_dict, f)
