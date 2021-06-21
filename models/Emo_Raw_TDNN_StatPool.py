@@ -80,12 +80,12 @@ class NIN(nn.Module):
 
 
 class Emo_Raw_TDNN(nn.Module):
-    def __init__(self, num_classes=4):
+    def __init__(self, args):
         super(Emo_Raw_TDNN, self).__init__()
         self.cnn_frontend = CNN_frontend()
         
         self.tdnn1 = TDNN(input_dim=128, output_dim=128, context_size=3, dilation=1,dropout_p=0.5)
-        self.Q1 = torch.nn.Parameter(torch.zeros(128, 64, 128))
+        self.Q1 = torch.nn.Parameter(torch.zeros(128, args.batch_size, 128))
         self.atten1 = nn.MultiheadAttention(embed_dim=128, num_heads=8)
 
         self.lstm1 = nn.LSTM(input_size=128, hidden_size=64,num_layers=1,bidirectional=True,dropout=0.5,batch_first=True)     
@@ -93,7 +93,7 @@ class Emo_Raw_TDNN(nn.Module):
         self.tdnn2 = TDNN(input_dim=128, output_dim=128, context_size=7, dilation=3,dropout_p=0.5)
         
         self.tdnn3 = TDNN(input_dim=128, output_dim=128, context_size=7, dilation=3,dropout_p=0.5)
-        self.Q2 = torch.nn.Parameter(torch.zeros(128, 64, 128))
+        self.Q2 = torch.nn.Parameter(torch.zeros(128, args.batch_size, 128))
         self.atten2 = nn.MultiheadAttention(embed_dim=128, num_heads=8)
 
         self.lstm2 = nn.LSTM(input_size=128, hidden_size=64,num_layers=1,bidirectional=True,dropout=0.5,batch_first=True)     
@@ -101,12 +101,12 @@ class Emo_Raw_TDNN(nn.Module):
         self.tdnn4 = TDNN(input_dim=128, output_dim=128, context_size=7, dilation=3,dropout_p=0.5)
         
         self.tdnn5 = TDNN(input_dim=128, output_dim=128, context_size=7, dilation=3,dropout_p=0.5)
-        self.Q3 = torch.nn.Parameter(torch.zeros(128, 64, 128))
+        self.Q3 = torch.nn.Parameter(torch.zeros(128, args.batch_size, 128))
         self.atten3 = nn.MultiheadAttention(embed_dim=128, num_heads=8)
 
         self.lstm3 = nn.LSTM(input_size=128, hidden_size=64,num_layers=1,bidirectional=True,dropout=0.5,batch_first=True)     
         self.multihead_attn = nn.MultiheadAttention(embed_dim=128, num_heads=8)
-        self.fc = nn.Linear(2*128,num_classes)
+        self.fc = nn.Linear(2 * 128, args.num_classes)
         
         
     def forward(self, inputs):

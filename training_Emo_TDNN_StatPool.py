@@ -62,7 +62,7 @@ dataloader_test = DataLoader(dataset_test, batch_size=args.batch_size, collate_f
 use_cuda = torch.cuda.is_available()
 device = torch.device("cuda" if use_cuda else "cpu")
 print('device: ', device)
-model = Emo_Raw_TDNN(args.num_classes).to(device)
+model = Emo_Raw_TDNN(args).to(device)
 optimizer = optim.Adam(model.parameters(), lr=0.0001, weight_decay=0.000001, betas=(0.9, 0.98), eps=1e-9)
 #loss_fun = nn.CrossEntropyLoss()
 loss_fun = Cross_Entropy_Loss_Label_Smooth()
