@@ -31,7 +31,7 @@ parser.add_argument('--raw_wav_path', type=str, default='raw_wavs.pkl')
 
 parser.add_argument('-input_dim', action="store_true", default=1)
 parser.add_argument('-num_classes', action="store_true", default=4)
-parser.add_argument('-batch_size', action="store_true", default=128)
+parser.add_argument('-batch_size', action="store_true", default=64)
 parser.add_argument('-use_gpu', action="store_true", default=True)
 parser.add_argument('-num_epochs', action="store_true", default=1000)
 args = parser.parse_args()
