@@ -43,7 +43,7 @@ def amplitude_modulate(waveform, min_gain_db=-12, max_gain_db=12):
 def augment(waveform, duration):
     extend_wav = resample(waveform)
     extend_wav = amplitude_modulate(extend_wav)
-    extend_wav = truncate(extend_wav, duration)
+    #extend_wav = truncate(extend_wav, duration)
     return extend_wav
 
 def speech_collate(batch):

@@ -34,6 +34,7 @@ parser.add_argument('-num_classes', action="store_true", default=4)
 parser.add_argument('-batch_size', action="store_true", default=64)
 parser.add_argument('-use_gpu', action="store_true", default=True)
 parser.add_argument('-num_epochs', action="store_true", default=1000)
+parser.add_argument('--lr', type=float, default=0.0001)
 args = parser.parse_args()
 
 class Cross_Entropy_Loss_Label_Smooth(nn.Module):
@@ -63,7 +64,7 @@ use_cuda = torch.cuda.is_available()
 device = torch.device("cuda" if use_cuda else "cpu")
 print('device: ', device)
 model = Emo_Raw_TDNN(args).to(device)
-optimizer = optim.Adam(model.parameters(), lr=0.0001, weight_decay=0.000001, betas=(0.9, 0.98), eps=1e-9)
+optimizer = optim.Adam(model.parameters(), lr=args.lr, weight_decay=0.000001, betas=(0.9, 0.98), eps=1e-9)
 #loss_fun = nn.CrossEntropyLoss()
 loss_fun = Cross_Entropy_Loss_Label_Smooth()
 

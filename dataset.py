@@ -32,7 +32,8 @@ class CustomDataset(Dataset):
         if self.mode == 'train':
             extend_wav = augment(waveform, self.duration)
         elif self.mode == 'test':
-            extend_wav = truncate(waveform, self.duration)
+            #extend_wav = truncate(waveform, self.duration)
+            extend_wav = waveform
         label = self.data[index]['emotion']
         duration = self.data[index]['duration']
         sample = {
