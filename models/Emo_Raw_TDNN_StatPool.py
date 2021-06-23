@@ -126,7 +126,7 @@ class Emo_Raw_TDNN(nn.Module):
         #print('lstm2 out', lstm2_out.shape)
 
         lstm2_out = lstm2_out.permute(1, 0, 2)
-        lstm2_out += cnn_out
+        lstm2_out = torch.cat((lstm2_out, cnn_out), 0)
         atten3_out, _ = self.atten3(self.Q3, lstm2_out, lstm2_out)
         atten3_out = atten3_out.permute(1, 0, 2)
         lstm3_out, _ = self.lstm3(atten3_out)
