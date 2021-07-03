@@ -64,18 +64,6 @@ class NIN(nn.Module):
     def forward(self, x):
         return self.blk(x)
 
-# class CustomAttention(nn.Module):
-#     def __init__(self, embed_dim, num_heads, context_size, stride=1, dilation=1, padding=0):
-#         super(CustomAttention, self).__init__()
-#         self.embed_dim = embed_dim
-#         self.num_heads = num_heads
-#         self.context_size = context_size
-#         self.dilation = dilation
-#         self.padding = padding
-    
-#     def forward(self, x):
-#         # N x seq x channels
-
 
 
 
@@ -124,7 +112,7 @@ class Emo_Raw_TDNN(nn.Module):
         atten2_out = atten2_out.permute(1, 0, 2)
         lstm2_out, _ = self.lstm2(atten2_out)
         #print('lstm2 out', lstm2_out.shape)
-        
+
 
         lstm2_out = lstm2_out.permute(1, 0, 2)
         lstm2_out = torch.cat((lstm2_out, cnn_out), 0)
