@@ -133,6 +133,7 @@ class Emo_Raw_TDNN(nn.Module):
         #print('lstm3 out', lstm3_out.shape)
 
         lstm3_out = lstm3_out.permute(1, 0, 2)
+        lstm3_out = torch.cat((lstm3_out, lstm1_out))
         lstm3_out, _ = self.multihead_attn(lstm3_out, lstm3_out, lstm3_out)
         lstm3_out = lstm3_out.permute(1, 0, 2)
         ### Stat Pool
