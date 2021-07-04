@@ -57,7 +57,7 @@ def collect_files(root_path):
                     if speaker[-1] != '5':
                         for rate in [0.9, 1.0, 1.1]:
                             waveform = resample(waveform, rate)
-                            for amplitude in np.random.uniform(-12, 12, 5):
+                            for amplitude in np.random.uniform(-12, 12, 3):
                                 extend_wav = amplitude_modulate(waveform, amplitude)
                                 extend_wav = truncate(extend_wav, args.duration)
                                 data.append(
