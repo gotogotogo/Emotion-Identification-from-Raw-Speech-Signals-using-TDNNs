@@ -53,7 +53,7 @@ def collect_files(root_path):
                 emotion = label_list[wave_name]
                 VAD = VAD_list[wave_name]
                 if emotion in ['ang', 'sad', 'neu', 'exc', 'hap']:
-                    duration = extend_wav.shape[1] / 16000
+                    duration = waveform.shape[1] / 16000
                     if speaker[-1] != '5':
                         for rate in [0.9, 1.0, 1.1]:
                             waveform = resample(waveform, rate)
@@ -82,7 +82,7 @@ def collect_files(root_path):
     print('successfully collect wav files')           
 
     collect_durations(data_dict)
-    
+
     with open('raw_wavs.pkl', 'wb') as f:
         pickle.dump(data_dict, f)
 
