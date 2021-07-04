@@ -30,8 +30,8 @@ def truncate(waveform, duration, sr=16000):
 
     return extend_wav
 
-def resample(waveform):
-    rate = 1 + (random.randint(0, 2) - 1) * 0.1
+def resample(waveform, rate):
+    # rate = 1 + (random.randint(0, 2) - 1) * 0.1
     resample = Resample(16000, 16000 * rate)
     return resample(waveform) 
 
