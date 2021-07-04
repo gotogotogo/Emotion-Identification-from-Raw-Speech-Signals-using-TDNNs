@@ -7,19 +7,18 @@ from utils.utils_wav import amplitude_modulate, truncate
 
 
 class CustomDataset(Dataset):
-    def __init__(self, raw_wav_path, mode, test_sess):
+    def __init__(self, mode, test_sess):
         self.mode = mode
         self.data = []
-        with open(raw_wav_path, 'rb') as f:
-            data_dict = pickle.load(f)
+
         if self.mode == 'train':
-            for session in data_dict:
-                if session[-1] != str(test_sess):
-                    self.data.extend(data_dict[session])
+            for i in range(1, 6):
+                if i != test_sess:
+                    with open('Session' + i + '.pkl', 'rb') as f:
+                        self.data.extend(pickle.load(f))
         elif self.mode == 'test':
-            for session in data_dict:
-                if session[-1] == str(test_sess):
-                    self.data.extend(data_dict[session])
+            with open('Session' + test_sess + '.pkl', 'rb') as f:
+                self.data.extend(pickle.load(f))
         else:
             assert False, 'Wrong mode!'
 

@@ -27,12 +27,9 @@ torch.multiprocessing.set_sharing_strategy('file_system')
 
 ########## Argument parser
 parser = argparse.ArgumentParser(add_help=False)
-parser.add_argument('--raw_wav_path', type=str, default='raw_wavs.pkl')
-
 parser.add_argument('-input_dim', type=int, default=1)
 parser.add_argument('-num_classes', type=int, default=4)
-parser.add_argument('--batch_size', type=int, default=64)
-parser.add_argument('-use_gpu', action="store_true", default=True)
+parser.add_argument('--batch_size', type=int, default=128)
 parser.add_argument('-num_epochs', type=int, default=1000)
 parser.add_argument('--lr', type=float, default=0.0001)
 args = parser.parse_args()
@@ -53,10 +50,10 @@ class Cross_Entropy_Loss_Label_Smooth(nn.Module):
         return loss 
 
 ### Data related
-dataset_train = CustomDataset(args.raw_wav_path, mode='train', test_sess=5)
+dataset_train = CustomDataset(mode='train', test_sess=5)
 dataloader_train = DataLoader(dataset_train, batch_size=args.batch_size, collate_fn=speech_collate, shuffle=True, drop_last=True, num_workers=14, pin_memory=True)  
 
-dataset_test = CustomDataset(args.raw_wav_path, mode='test', test_sess=5)
+dataset_test = CustomDataset(mode='test', test_sess=5)
 dataloader_test = DataLoader(dataset_test, batch_size=args.batch_size, collate_fn=speech_collate, shuffle=False, drop_last=True, num_workers=14, pin_memory=True)  
 
 ## Model related
