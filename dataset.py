@@ -14,10 +14,10 @@ class CustomDataset(Dataset):
         if self.mode == 'train':
             for i in range(1, 6):
                 if i != test_sess:
-                    with open('Session' + i + '.pkl', 'rb') as f:
+                    with open('Session' + str(i) + '.pkl', 'rb') as f:
                         self.data.extend(pickle.load(f))
         elif self.mode == 'test':
-            with open('Session' + test_sess + '.pkl', 'rb') as f:
+            with open('Session' + str(test_sess) + '.pkl', 'rb') as f:
                 self.data.extend(pickle.load(f))
         else:
             assert False, 'Wrong mode!'
