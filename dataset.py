@@ -7,9 +7,8 @@ from utils.utils_wav import amplitude_modulate, truncate
 
 
 class CustomDataset(Dataset):
-    def __init__(self, raw_wav_path, mode, test_sess, duration):
+    def __init__(self, raw_wav_path, mode, test_sess):
         self.mode = mode
-        self.duration = duration
         self.data = []
         with open(raw_wav_path, 'rb') as f:
             data_dict = pickle.load(f)
@@ -29,15 +28,10 @@ class CustomDataset(Dataset):
     
     def __getitem__(self, index):
         waveform = self.data[index]['wav']
-        if self.mode == 'train':
-            extend_wav = amplitude_modulate(waveform)
-            extend_wav = truncate(extend_wav, self.duration)
-        elif self.mode == 'test':
-            extend_wav = truncate(waveform, self.duration)
         label = self.data[index]['emotion']
         duration = self.data[index]['duration']
         sample = {
-                'waveform': torch.from_numpy(np.ascontiguousarray(extend_wav)), 
+                'waveform': torch.from_numpy(np.ascontiguousarray(waveform)), 
                 'label': torch.from_numpy(np.ascontiguousarray(label)), 
                 'duration': torch.from_numpy(np.ascontiguousarray(duration))}
         return sample
