@@ -72,7 +72,7 @@ def collect_files(root_path):
                         extend_wav = truncate(waveform, args.duration)
                         data.append(
                             {
-                                'wav': waveform,
+                                'wav': extend_wav,
                                 'emotion': emotion_id[emotion],
                                 'gender': gender_id[wave_name[5]],
                                 'duration': duration,
