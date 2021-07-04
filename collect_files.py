@@ -23,9 +23,9 @@ def collect_files(root_path):
         'Session5': [{'wav': wav, 'emotion': emotion, 'gender': gender, 'duration': duration, 'vad': [V, A, D]},...],
     }
     '''
-    data_dict = {}
+    
     for speaker in tqdm(os.listdir(root_path)):
-        data_dict[speaker] = []
+        data = []
         wav_dir =  os.path.join(root_path, speaker, 'sentences/wav')
         emo_dir = os.path.join(root_path, speaker, 'dialog/EmoEvaluation')
         for sess in os.listdir(wav_dir):
@@ -60,7 +60,7 @@ def collect_files(root_path):
                             for amplitude in np.random.uniform(-12, 12, 5):
                                 extend_wav = amplitude_modulate(waveform, amplitude)
                                 extend_wav = truncate(extend_wav, args.duration)
-                                data_dict[speaker].append(
+                                data.append(
                                 {
                                     'wav': extend_wav,
                                     'emotion': emotion_id[emotion],
@@ -70,7 +70,7 @@ def collect_files(root_path):
                                 })
                     else:
                         extend_wav = truncate(waveform, args.duration)
-                        data_dict[speaker].append(
+                        data.append(
                             {
                                 'wav': waveform,
                                 'emotion': emotion_id[emotion],
@@ -78,16 +78,15 @@ def collect_files(root_path):
                                 'duration': duration,
                                 'vad': VAD
                             })
-        print('len of ', speaker, ' :', len(data_dict[speaker]))
+        print('len of ', speaker, ' :', len(data))
+        with open(speaker + '.pkl', 'wb') as f:
+            pickle.dump(data, f)
+        if speaker[-1] == '5':
+            collect_durations(data)
     print('successfully collect wav files')           
+    
 
-    collect_durations(data_dict)
-
-    with open('raw_wavs.pkl', 'wb') as f:
-        pickle.dump(data_dict, f)
-
-
-def collect_durations(data_dict):
+def collect_durations(data):
     duration_dict = {}
     duration_dict[1] = 0
     duration_dict[2] = 0
@@ -95,22 +94,20 @@ def collect_durations(data_dict):
     duration_dict[8] = 0
     duration_dict[12] = 0
     duration_dict['gt_12'] = 0
-    for speaker in data_dict:
-        if speaker[-1] == '5':
-            for i in range(len(data_dict[speaker])):
-                dur = data_dict[speaker][i]['duration']
-                if dur < 1:
-                    duration_dict[1] += 1
-                elif dur < 2:
-                    duration_dict[2] += 1
-                elif dur < 4:
-                    duration_dict[4] += 1
-                elif dur < 8:
-                    duration_dict[8] += 1
-                elif dur < 12:
-                    duration_dict[12] += 1
-                else:
-                    duration_dict['gt_12'] += 1
+    for i in range(len(data)):
+        dur = data[i]['duration']
+        if dur < 1:
+            duration_dict[1] += 1
+        elif dur < 2:
+            duration_dict[2] += 1
+        elif dur < 4:
+            duration_dict[4] += 1
+        elif dur < 8:
+            duration_dict[8] += 1
+        elif dur < 12:
+            duration_dict[12] += 1
+        else:
+            duration_dict['gt_12'] += 1
     print(duration_dict)
 
 if __name__ == "__main__":
