@@ -35,8 +35,7 @@ def resample(waveform, rate):
     resample = Resample(16000, 16000 * rate)
     return resample(waveform) 
 
-def amplitude_modulate(waveform, min_gain_db=-12, max_gain_db=12):
-    amplitude = random.uniform(min_gain_db, max_gain_db)
+def amplitude_modulate(waveform, amplitude, min_gain_db=-12, max_gain_db=12):
     amplitude = 10 ** (amplitude / 20)
     return waveform * amplitude
 
