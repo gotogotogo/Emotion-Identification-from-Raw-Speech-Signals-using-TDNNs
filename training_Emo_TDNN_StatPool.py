@@ -117,7 +117,7 @@ def test(test_loader,epoch, best_acc, target_names):
         val_loss_list=[]
         full_preds=[]
         full_gts=[]
-        for i_batch, (features, labels, durations) in enumerate(test_loader):
+        for (features, labels, durations) in test_loader:
             features = torch.from_numpy(np.asarray([torch_tensor.numpy() for torch_tensor in features])).float()
             labels = torch.from_numpy(np.asarray([torch_tensor[0].numpy() for torch_tensor in labels]))
             durations = torch.from_numpy(np.asarray([torch_tensor[0].numpy() for torch_tensor in durations]))
@@ -126,12 +126,12 @@ def test(test_loader,epoch, best_acc, target_names):
             features = features.to(device)
             labels = labels.to(device)
             durations = durations.to(device)
-            pred_logits = model(features)
+            c_pred, d_pred= model(features)
             #### CE loss
-            loss = loss_fun(pred_logits,labels)
+            loss = loss_fun(c_pred,labels)
             val_loss_list.append(loss.item())
             #train_acc_list.append(accuracy)
-            predictions = np.argmax(pred_logits.detach().cpu().numpy(),axis=1)
+            predictions = np.argmax(c_pred.detach().cpu().numpy(),axis=1)
             for i in range(len(labels)):
                 if(labels[i] != predictions[i]):
                     if durations[i] < 2:
