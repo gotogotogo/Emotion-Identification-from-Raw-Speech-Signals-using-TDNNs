@@ -50,8 +50,10 @@ def speech_collate(batch):
     targets = []
     raw_data = []
     duration = []
+    vad = []
     for sample in batch:
         raw_data.append(sample['waveform'])
         targets.append(sample['label'])
         duration.append(sample['duration'])
-    return raw_data, targets, duration
+        vad.append(sample['vad'])
+    return raw_data, targets, duration, vad

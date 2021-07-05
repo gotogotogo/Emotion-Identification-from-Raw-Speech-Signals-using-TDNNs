@@ -35,8 +35,12 @@ class CustomDataset(Dataset):
             extend_wav = truncate(waveform, self.duration)
         label = self.data[index]['emotion']
         duration = self.data[index]['duration']
+        vad = self.data[index]['vad']
         sample = {
                 'waveform': torch.from_numpy(np.ascontiguousarray(extend_wav)), 
                 'label': torch.from_numpy(np.ascontiguousarray(label)), 
-                'duration': torch.from_numpy(np.ascontiguousarray(duration))}
+                'duration': torch.from_numpy(np.ascontiguousarray(duration)),
+                'vad': torch.from_numpy(np.ascontiguousarray(vad))
+                }
+                
         return sample

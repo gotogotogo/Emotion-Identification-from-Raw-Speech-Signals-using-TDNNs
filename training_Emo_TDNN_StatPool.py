@@ -74,19 +74,22 @@ def train(train_loader,epoch):
     full_gts=[]
     model.train()
     train_loader = tqdm(train_loader)
-    for step, (features, labels, _) in enumerate(train_loader):
+    for step, (features, labels, _, VAD) in enumerate(train_loader):
         #print(features.shape)
         features = torch.from_numpy(np.asarray([torch_tensor.numpy() for torch_tensor in features])).float()         
         labels = torch.from_numpy(np.asarray([torch_tensor[0].numpy() for torch_tensor in labels]))
+        vad = torch.from_numpy(np.asarray([torch_tensor.numpy() for torch_tensor in VAD]))
         #print(labels.shape)
         # print('labels shape', labels.shape)
         features = features.to(device)
         labels = labels.to(device)
+        vad = vad.to(device)
         features.requires_grad = True
         optimizer.zero_grad()
         pred_logits = model(features)
         #### CE loss
-        loss = loss_fun(pred_logits,labels)
+        loss_d = loss_fun(pred_logits,labels)
+        loss_c = nn.MSELoss()()
         loss.backward()
         optimizer.step()
         train_loss_list.append(loss.item())
