@@ -86,10 +86,11 @@ def train(train_loader,epoch):
         vad = vad.to(device)
         features.requires_grad = True
         optimizer.zero_grad()
-        pred_logits = model(features)
+        c_pred, d_pred = model(features)
         #### CE loss
-        loss_d = loss_fun(pred_logits,labels)
-        loss_c = nn.MSELoss()()
+        loss_c = loss_fun(c_pred,labels)
+        loss_d = nn.MSELoss()(d_pred, vad)
+        loss = loss_c + loss_d
         loss.backward()
         optimizer.step()
         train_loss_list.append(loss.item())

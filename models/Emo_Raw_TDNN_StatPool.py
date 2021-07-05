@@ -93,9 +93,12 @@ class Emo_Raw_TDNN(nn.Module):
         self.atten3 = nn.MultiheadAttention(embed_dim=128, num_heads=8)
 
         self.lstm3 = nn.LSTM(input_size=128, hidden_size=64,num_layers=1,bidirectional=True,dropout=0.5,batch_first=True)     
-        self.multihead_attn = nn.MultiheadAttention(embed_dim=128, num_heads=8)
-        self.fc = nn.Linear(2 * 128, args.num_classes)
-        
+        self.multi_head1 = nn.MultiheadAttention(embed_dim=128, num_heads=8)
+        self.multi_head2 = nn.MultiheadAttention(embed_dim=128, num_heads=8)
+        self.fc_c1 = nn.Linear(2 * 128, 64)
+        self.fc_c2 = nn.Linear(64, args.num_classes)
+        self.fc_d1 = nn.Linear(2 * 128, 64)
+        self.fc_d2 = nn.Linear(64, 3)
         
     def forward(self, inputs):
         cnn_out = self.cnn_frontend(inputs)
@@ -123,16 +126,24 @@ class Emo_Raw_TDNN(nn.Module):
 
         lstm3_out = lstm3_out.permute(1, 0, 2)
         lstm3_out = torch.cat((lstm3_out, lstm1_out))
-        lstm3_out, _ = self.multihead_attn(lstm3_out, lstm3_out, lstm3_out)
-        lstm3_out = lstm3_out.permute(1, 0, 2)
-        ### Stat Pool
-        mean = torch.mean(lstm3_out,1)
-        # print('mean shape: ', mean.shape)
-        std = torch.var(lstm3_out,1)
-        stat_pooling = torch.cat((mean,std),1)
 
-        emo_predictions= self.fc(stat_pooling)
-        return emo_predictions
+        c_out, _ = self.multi_head1(lstm3_out, lstm3_out, lstm3_out)
+        c_out = c_out.permute(1, 0, 2)
+        c_mean = torch.mean(c_out, 1)
+        c_std = torch.var(c_out, 1)
+        c_pooling = torch.cat((c_mean, c_std), 1)
+        c_pred = self.fc_c1(c_pooling)
+        c_pred = self.fc_c2(c_pred)
+
+        d_out, _ = self.multi_head2(lstm3_out, lstm3_out, lstm3_out)
+        d_out = d_out.permute(1, 0, 2)
+        d_mean = torch.mean(d_out, 1)
+        d_std = torch.var(d_out, 1)
+        d_pooling = torch.cat((d_mean, d_std), 1)
+        d_pred= self.fc_d1(d_pooling)
+        d_pred = self.fc_d2(d_pred)
+
+        return c_pred, d_pred
     
     
     
