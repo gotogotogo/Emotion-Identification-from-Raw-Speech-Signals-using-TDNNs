@@ -98,7 +98,7 @@ def train(train_loader,epoch):
         if step % 10 == 0:
             train_loader.desc = "[epoch {} step {}] mean loss {}".format(epoch, step, np.mean(np.asarray(train_loss_list)))
         
-        predictions = np.argmax(pred_logits.detach().cpu().numpy(),axis=1)
+        predictions = np.argmax(c_pred.detach().cpu().numpy(),axis=1)
         for pred in predictions:
             full_preds.append(pred)
         for lab in labels.detach().cpu().numpy():
