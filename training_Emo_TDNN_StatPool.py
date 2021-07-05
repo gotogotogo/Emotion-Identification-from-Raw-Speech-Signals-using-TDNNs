@@ -78,7 +78,7 @@ def train(train_loader,epoch):
         #print(features.shape)
         features = torch.from_numpy(np.asarray([torch_tensor.numpy() for torch_tensor in features])).float()         
         labels = torch.from_numpy(np.asarray([torch_tensor[0].numpy() for torch_tensor in labels]))
-        vad = torch.from_numpy(np.asarray([torch_tensor.numpy() for torch_tensor in VAD]))
+        vad = torch.from_numpy(np.asarray([torch_tensor.numpy() for torch_tensor in VAD])).float()
         #print(labels.shape)
         # print('labels shape', labels.shape)
         features = features.to(device)
