@@ -30,14 +30,21 @@ def truncate(waveform, duration, sr=16000):
 
     return extend_wav
 
-def resample(waveform, rate):
-    # rate = 1 + (random.randint(0, 2) - 1) * 0.1
+def resample(waveform):
+    rate = 1 + (random.randint(0, 2) - 1) * 0.1
     resample = Resample(16000, 16000 * rate)
     return resample(waveform) 
 
-def amplitude_modulate(waveform, amplitude, min_gain_db=-12, max_gain_db=12):
+def amplitude_modulate(waveform, min_gain_db=-12, max_gain_db=12):
+    amplitude = random.uniform(min_gain_db, max_gain_db)
     amplitude = 10 ** (amplitude / 20)
     return waveform * amplitude
+
+def augment(waveform, duration):
+    extend_wav = resample(waveform)
+    extend_wav = amplitude_modulate(extend_wav)
+    extend_wav = truncate(extend_wav, duration)
+    return extend_wav
 
 def speech_collate(batch):
     targets = []

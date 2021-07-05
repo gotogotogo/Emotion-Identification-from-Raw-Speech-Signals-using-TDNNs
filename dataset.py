@@ -3,22 +3,24 @@ import torch
 from torch.utils.data import Dataset 
 import numpy as np
 import pickle
-from utils.utils_wav import amplitude_modulate, truncate
+from utils.utils_wav import augment, truncate
 
 
 class CustomDataset(Dataset):
-    def __init__(self, mode, test_sess):
+    def __init__(self, raw_wav_path, mode, test_sess, duration):
         self.mode = mode
+        self.duration = duration
         self.data = []
-
+        with open(raw_wav_path, 'rb') as f:
+            data_dict = pickle.load(f)
         if self.mode == 'train':
-            for i in range(1, 6):
-                if i != test_sess:
-                    with open('Session' + str(i) + '.pkl', 'rb') as f:
-                        self.data.extend(pickle.load(f))
+            for session in data_dict:
+                if session[-1] != str(test_sess):
+                    self.data.extend(data_dict[session])
         elif self.mode == 'test':
-            with open('Session' + str(test_sess) + '.pkl', 'rb') as f:
-                self.data.extend(pickle.load(f))
+            for session in data_dict:
+                if session[-1] == str(test_sess):
+                    self.data.extend(data_dict[session])
         else:
             assert False, 'Wrong mode!'
 
@@ -27,10 +29,14 @@ class CustomDataset(Dataset):
     
     def __getitem__(self, index):
         waveform = self.data[index]['wav']
+        if self.mode == 'train':
+            extend_wav = augment(waveform, self.duration)
+        elif self.mode == 'test':
+            extend_wav = truncate(waveform, self.duration)
         label = self.data[index]['emotion']
         duration = self.data[index]['duration']
         sample = {
-                'waveform': torch.from_numpy(np.ascontiguousarray(waveform)), 
+                'waveform': torch.from_numpy(np.ascontiguousarray(extend_wav)), 
                 'label': torch.from_numpy(np.ascontiguousarray(label)), 
                 'duration': torch.from_numpy(np.ascontiguousarray(duration))}
         return sample

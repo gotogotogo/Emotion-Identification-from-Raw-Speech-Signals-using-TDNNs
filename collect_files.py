@@ -1,18 +1,16 @@
 # -*- coding: utf-8 -*-
 
 import os
-import torch
 import numpy as np
 import glob
 import pickle
 import argparse
 from tqdm import tqdm
-from utils.utils_wav import resample, amplitude_modulate, truncate
+from utils.utils_wav import resample
 import torchaudio
 
 parser = argparse.ArgumentParser(add_help=False)
-parser.add_argument('--raw_path', type=str, default='/input/IEMOCAP')
-parser.add_argument('--duration', type=float, default=8.0)
+parser.add_argument('--raw_path', type=str, default='F:/IEMOCAP')
 emotion_id = {'hap': 0, 'exc': 0, 'ang': 1, 'sad': 2, 'neu': 3}
 gender_id = {'M':0,'F':1}
 def collect_files(root_path):
@@ -23,9 +21,9 @@ def collect_files(root_path):
         'Session5': [{'wav': wav, 'emotion': emotion, 'gender': gender, 'duration': duration, 'vad': [V, A, D]},...],
     }
     '''
-    
+    data_dict = {}
     for speaker in tqdm(os.listdir(root_path)):
-        data = []
+        data_dict[speaker] = []
         wav_dir =  os.path.join(root_path, speaker, 'sentences/wav')
         emo_dir = os.path.join(root_path, speaker, 'dialog/EmoEvaluation')
         for sess in os.listdir(wav_dir):
@@ -53,40 +51,32 @@ def collect_files(root_path):
                 emotion = label_list[wave_name]
                 VAD = VAD_list[wave_name]
                 if emotion in ['ang', 'sad', 'neu', 'exc', 'hap']:
-                    duration = waveform.shape[1] / 16000
                     if speaker[-1] != '5':
-                        for rate in [0.9, 1.0, 1.1]:
-                            waveform = resample(waveform, rate)
-                            for amplitude in np.random.uniform(-12, 12, 3):
-                                extend_wav = amplitude_modulate(waveform, amplitude)
-                                extend_wav = truncate(extend_wav, args.duration)
-                                data.append(
-                                {
-                                    'wav': extend_wav,
-                                    'emotion': emotion_id[emotion],
-                                    'gender': gender_id[wave_name[5]],
-                                    'duration': duration,
-                                    'vad': VAD
-                                })
+                        data_dict[speaker].append(
+                        {
+                            'wav': waveform,
+                            'emotion': emotion_id[emotion],
+                            'gender': gender_id[wave_name[5]],
+                            'duration': waveform.shape[1] / 16000,
+                            'vad': VAD
+                        })
                     else:
-                        extend_wav = truncate(waveform, args.duration)
-                        data.append(
+                        data_dict[speaker].append(
                             {
-                                'wav': extend_wav,
+                                'wav': waveform,
                                 'emotion': emotion_id[emotion],
                                 'gender': gender_id[wave_name[5]],
-                                'duration': duration,
+                                'duration': waveform.shape[1] / 16000,
                                 'vad': VAD
                             })
-        print('len of ', speaker, ' :', len(data))
-        with open(speaker + '.pkl', 'wb') as f:
-            pickle.dump(data, f)
-        if speaker[-1] == '5':
-            collect_durations(data)
+        print('len of ', speaker, ' :', len(data_dict[speaker]))
+    collect_durations(data_dict)
+    with open('raw_wavs.pkl', 'wb') as f:
+        pickle.dump(data_dict, f)
     print('successfully collect wav files')           
-    
 
-def collect_durations(data):
+
+def collect_durations(data_dict):
     duration_dict = {}
     duration_dict[1] = 0
     duration_dict[2] = 0
@@ -94,20 +84,22 @@ def collect_durations(data):
     duration_dict[8] = 0
     duration_dict[12] = 0
     duration_dict['gt_12'] = 0
-    for i in range(len(data)):
-        dur = data[i]['duration']
-        if dur < 1:
-            duration_dict[1] += 1
-        elif dur < 2:
-            duration_dict[2] += 1
-        elif dur < 4:
-            duration_dict[4] += 1
-        elif dur < 8:
-            duration_dict[8] += 1
-        elif dur < 12:
-            duration_dict[12] += 1
-        else:
-            duration_dict['gt_12'] += 1
+    for speaker in data_dict:
+        if speaker[-1] == '5':
+            for i in range(len(data_dict[speaker])):
+                dur = data_dict[speaker][i]['duration']
+                if dur < 1:
+                    duration_dict[1] += 1
+                elif dur < 2:
+                    duration_dict[2] += 1
+                elif dur < 4:
+                    duration_dict[4] += 1
+                elif dur < 8:
+                    duration_dict[8] += 1
+                elif dur < 12:
+                    duration_dict[12] += 1
+                else:
+                    duration_dict['gt_12'] += 1
     print(duration_dict)
 
 if __name__ == "__main__":
