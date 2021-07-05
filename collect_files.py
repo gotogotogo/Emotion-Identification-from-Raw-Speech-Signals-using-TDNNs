@@ -45,7 +45,7 @@ def collect_files(root_path):
             files = glob.glob(os.path.join(wav_dir, sess, '*.wav'))
             for file_name in files:
                 #print(file_name)
-                wave_name = file_name.split('\\')[-1][:-4]
+                wave_name = file_name.split('/')[-1][:-4]
                 waveform, _ = torchaudio.load(file_name)
                 #print(wave_name)
                 emotion = label_list[wave_name]
