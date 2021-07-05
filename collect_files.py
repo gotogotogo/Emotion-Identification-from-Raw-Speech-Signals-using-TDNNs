@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
 
 import os
-import torch
 import numpy as np
 import glob
 import pickle
 import argparse
 from tqdm import tqdm
+from utils.utils_wav import resample
 import torchaudio
 
 parser = argparse.ArgumentParser(add_help=False)
@@ -39,7 +39,7 @@ def collect_files(root_path):
                         t = line.split()
                         V = t[5][1:-1]
                         A = t[6][0:-1]
-                        D = t[7][:-1]
+                        D = t[7][: -1]
                         label_list[t[3]] = t[4]
                         VAD_list[t[3]] = [float(V), float(A), float(D)]
             files = glob.glob(os.path.join(wav_dir, sess, '*.wav'))
@@ -51,41 +51,48 @@ def collect_files(root_path):
                 emotion = label_list[wave_name]
                 VAD = VAD_list[wave_name]
                 if emotion in ['ang', 'sad', 'neu', 'exc', 'hap']:
-                    data_dict[speaker].append({'wav': waveform, 'emotion': emotion_id[emotion], 'gender': gender_id[wave_name[5]], 'duration': waveform.shape[1] / 16000, 'vad': VAD})
+                    data_dict[speaker].append(
+                    {
+                        'wav': waveform,
+                        'emotion': emotion_id[emotion],
+                        'gender': gender_id[wave_name[5]],
+                        'duration': waveform.shape[1] / 16000,
+                        'vad': VAD
+                    })
+                   
         print('len of ', speaker, ' :', len(data_dict[speaker]))
+    collect_durations(data_dict)
     with open('raw_wavs.pkl', 'wb') as f:
         pickle.dump(data_dict, f)
     print('successfully collect wav files')           
 
 
-def collect_durations():
-    with open('raw_wavs.pkl', 'rb') as f:         
-        data_dict = pickle.load(f)
-        duration_dict = {}
-        duration_dict[1] = 0
-        duration_dict[2] = 0
-        duration_dict[4] = 0
-        duration_dict[8] = 0
-        duration_dict[12] = 0
-        duration_dict['gt_12'] = 0
-        for speaker in data_dict:
-            if speaker[-1] == '5':
-                for i in range(len(data_dict[speaker])):
-                    dur = data_dict[speaker][i]['duration']
-                    if dur < 1:
-                        duration_dict[1] += 1
-                    elif dur < 2:
-                        duration_dict[2] += 1
-                    elif dur < 4:
-                        duration_dict[4] += 1
-                    elif dur < 8:
-                        duration_dict[8] += 1
-                    elif dur < 12:
-                        duration_dict[12] += 1
-                    else:
-                        duration_dict['gt_12'] += 1
-        print(duration_dict)
+def collect_durations(data_dict):
+    duration_dict = {}
+    duration_dict[1] = 0
+    duration_dict[2] = 0
+    duration_dict[4] = 0
+    duration_dict[8] = 0
+    duration_dict[12] = 0
+    duration_dict['gt_12'] = 0
+    for speaker in data_dict:
+        if speaker[-1] == '5':
+            for i in range(len(data_dict[speaker])):
+                dur = data_dict[speaker][i]['duration']
+                if dur < 1:
+                    duration_dict[1] += 1
+                elif dur < 2:
+                    duration_dict[2] += 1
+                elif dur < 4:
+                    duration_dict[4] += 1
+                elif dur < 8:
+                    duration_dict[8] += 1
+                elif dur < 12:
+                    duration_dict[12] += 1
+                else:
+                    duration_dict['gt_12'] += 1
+    print(duration_dict)
+
 if __name__ == "__main__":
     args = parser.parse_args()
     collect_files(args.raw_path)
-    collect_durations()
