@@ -117,7 +117,7 @@ def test(test_loader,epoch, best_acc, target_names):
         val_loss_list=[]
         full_preds=[]
         full_gts=[]
-        for (features, labels, durations) in test_loader:
+        for (features, labels, durations, VAD) in test_loader:
             features = torch.from_numpy(np.asarray([torch_tensor.numpy() for torch_tensor in features])).float()
             labels = torch.from_numpy(np.asarray([torch_tensor[0].numpy() for torch_tensor in labels]))
             durations = torch.from_numpy(np.asarray([torch_tensor[0].numpy() for torch_tensor in durations]))
