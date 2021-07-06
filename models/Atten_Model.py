@@ -100,10 +100,10 @@ class Atten_Model(nn.Module):
         
     def forward(self, inputs):
         cnn_out = self.cnn_frontend(inputs)
-        x = cnn_out.permute(0, 2, 1)
+        cnn_out = cnn_out.permute(0, 2, 1)
 
-        x = x.permute(1, 0, 2)
-        atten1_out, _ = self.atten1(self.Q1, x, x)
+        cnn_out = cnn_out.permute(1, 0, 2)
+        atten1_out, _ = self.atten1(self.Q1, cnn_out, cnn_out)
         atten1_out = atten1_out.permute(1, 0, 2)
         lstm1_out, _ = self.lstm1(atten1_out)
         #print('lstm1 out', lstm1_out.shape)
@@ -116,7 +116,7 @@ class Atten_Model(nn.Module):
 
 
         lstm2_out = lstm2_out.permute(1, 0, 2)
-        lstm2_out = torch.cat((lstm2_out, x), 0)
+        lstm2_out = torch.cat((lstm2_out, cnn_out), 0)
         atten3_out, _ = self.atten3(self.Q3, lstm2_out, lstm2_out)
         atten3_out = atten3_out.permute(1, 0, 2)
         lstm3_out, _ = self.lstm3(atten3_out)
