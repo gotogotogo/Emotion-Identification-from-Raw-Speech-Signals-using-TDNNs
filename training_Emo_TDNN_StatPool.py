@@ -51,25 +51,9 @@ class Cross_Entropy_Loss_Label_Smooth(nn.Module):
         loss = - torch.sum(log_prob * smoothed_labels) / N
         return loss 
 
-### Data related
-dataset_train = CustomDataset(args.raw_wav_path, mode='train', test_sess=5, duration=args.duration)
-dataloader_train = DataLoader(dataset_train, batch_size=args.batch_size, collate_fn=speech_collate, shuffle=True, drop_last=True, num_workers=14, pin_memory=True)  
-
-dataset_test = CustomDataset(args.raw_wav_path, mode='test', test_sess=5, duration=args.duration)
-dataloader_test = DataLoader(dataset_test, batch_size=args.batch_size, collate_fn=speech_collate, shuffle=False, drop_last=True, num_workers=14, pin_memory=True)  
-
-## Model related
-use_cuda = torch.cuda.is_available()
-device = torch.device("cuda" if use_cuda else "cpu")
-print('device: ', device)
-model = Emo_Raw_TDNN(args).to(device)
-optimizer = optim.Adam(model.parameters(), lr=args.lr, weight_decay=0.000001, betas=(0.9, 0.98), eps=1e-9)
-#loss_fun = nn.CrossEntropyLoss()
-loss_fun = Cross_Entropy_Loss_Label_Smooth()
 
 
-
-def train(train_loader,epoch):
+def train(train_loader,epoch, model, device, optimizer, criterion):
     train_loss_list=[]
     full_preds=[]
     full_gts=[]
@@ -89,7 +73,7 @@ def train(train_loader,epoch):
         optimizer.zero_grad()
         c_pred, d_pred = model(features)
         #### CE loss
-        loss_c = loss_fun(c_pred,labels)
+        loss_c = criterion(c_pred,labels)
         loss_d = nn.MSELoss()(d_pred, vad)
         loss = loss_c + loss_d
         loss.backward()
@@ -105,13 +89,13 @@ def train(train_loader,epoch):
         for lab in labels.detach().cpu().numpy():
             full_gts.append(lab)
             
-    unweighted_avg_recall = balanced_accuracy_score(full_gts,full_preds)
-    mean_loss = np.mean(np.asarray(train_loss_list))
+    unweighted_avg_recall = round(balanced_accuracy_score(full_gts,full_preds), 5)
+    mean_loss = round(np.mean(np.asarray(train_loss_list)), 5)
     print('[epoch {}] train loss {} train unweighted average recall {}'.format(epoch, mean_loss, unweighted_avg_recall))
     
 
 
-def test(test_loader,epoch, best_acc, target_names):
+def test(test_loader,epoch, model, device, criterion):
     model.eval()
     duration_dict = {2: 0, 4: 0, 8: 0, 12:0, 20: 0}
     with torch.no_grad():
@@ -129,7 +113,7 @@ def test(test_loader,epoch, best_acc, target_names):
             durations = durations.to(device)
             c_pred, d_pred= model(features)
             #### CE loss
-            loss = loss_fun(c_pred,labels)
+            loss = criterion(c_pred,labels)
             val_loss_list.append(loss.item())
             #train_acc_list.append(accuracy)
             predictions = np.argmax(c_pred.detach().cpu().numpy(),axis=1)
@@ -150,9 +134,49 @@ def test(test_loader,epoch, best_acc, target_names):
             for lab in labels.detach().cpu().numpy():
                 full_gts.append(lab)
                 
-        unweighted_avg_recall = balanced_accuracy_score(full_gts,full_preds)
-        mean_loss = np.mean(np.asarray(val_loss_list))
+        unweighted_avg_recall = round(balanced_accuracy_score(full_gts,full_preds), 5)
+        mean_loss = round(np.mean(np.asarray(val_loss_list)), 5)
         print('[epoch {}] test loss {} test unweighted average recall {}\n'.format(epoch, mean_loss, unweighted_avg_recall))
+        print(duration_dict)
+    return unweighted_avg_recall, mean_loss, full_gts, full_preds
+
+def main(args):
+    print("Pytorch version:{}".format(torch.__version__))
+    if torch.cuda.is_available():
+        torch.cuda.manual_seed(1)
+        device = torch.device("cuda")
+    else:
+        device = torch.device("cpu")
+    print('device: ', device)
+    
+    train_set = CustomDataset(args.raw_wav_path, mode='train', test_sess=5, duration=args.duration)
+    print('len of train set: ', len(train_set))
+    train_loader = DataLoader(train_set, batch_size=args.batch_size, collate_fn=speech_collate, shuffle=True, drop_last=True, num_workers=14, pin_memory=True)  
+
+    test_set = CustomDataset(args.raw_wav_path, mode='test', test_sess=5, duration=args.duration)
+    print('len of test set: ', len(test_set))
+    test_loader = DataLoader(test_set, batch_size=args.batch_size, collate_fn=speech_collate, shuffle=False, drop_last=True, num_workers=14, pin_memory=True)
+
+    model = Emo_Raw_TDNN(args).to(device)
+
+    # GPU / multi-GPU
+    if args.multi_gpus and torch.cuda.device_count() > 1:
+        model = nn.DataParallel(model)
+        model = model.to(device)
+        print('DataParallel! Using', torch.cuda.device_count(), 'GPUs!')
+    else:
+        print('Single CPU/GPU! Using', device)
+    
+    optimizer = optim.Adam(model.parameters(), lr=args.lr, weight_decay=0.000001, betas=(0.9, 0.98), eps=1e-9)
+    #loss_fun = nn.CrossEntropyLoss()
+    criterion = Cross_Entropy_Loss_Label_Smooth().to(device)
+
+
+    best_acc = 0.0
+    target_names = ['happy', 'angry', 'sad', 'neutral']
+    for epoch in range(args.num_epochs):
+        train(train_loader, epoch, model, device, optimizer, criterion)
+        unweighted_avg_recall, mean_loss, full_gts, full_preds = test(test_loader, epoch, model, device, criterion)
         if unweighted_avg_recall > best_acc:
             print('-' * 20, 'best model in epoch {} '.format(epoch), '-' * 20) 
             best_acc = unweighted_avg_recall
@@ -161,17 +185,9 @@ def test(test_loader,epoch, best_acc, target_names):
             model_save_path = os.path.join('save_model', 'best_'+str(epoch)+'_'+str(round(unweighted_avg_recall, 5)))
             state_dict = {'model': model.state_dict(),'optimizer': optimizer.state_dict(),'epoch': epoch}
             torch.save(state_dict, model_save_path)
-        print(duration_dict)
-    return best_acc
-    
+
 if __name__ == '__main__':
-    if not os.path.isdir('save_model'):
-        os.makedirs('save_model')
-    best_acc = 0.0
-    target_names = ['happy', 'angry', 'sad', 'neutral'] 
-    for epoch in range(args.num_epochs):
-        train(dataloader_train,epoch)
-        best_acc = test(dataloader_test,epoch, best_acc, target_names)
+    main(args)
         
     
     
