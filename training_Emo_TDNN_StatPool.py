@@ -33,6 +33,7 @@ parser.add_argument('--batch_size', type=int, default=128)
 parser.add_argument('-num_epochs', type=int, default=1000)
 parser.add_argument('--raw_wav_path', type=str, default='raw_wavs.pkl')
 parser.add_argument('--lr', type=float, default=0.0001)
+parser.add_argument('--duration', type=float, default=8)
 args = parser.parse_args()
 
 class Cross_Entropy_Loss_Label_Smooth(nn.Module):
@@ -51,10 +52,10 @@ class Cross_Entropy_Loss_Label_Smooth(nn.Module):
         return loss 
 
 ### Data related
-dataset_train = CustomDataset(args.raw_wav_path, mode='train', test_sess=5, duration=6)
+dataset_train = CustomDataset(args.raw_wav_path, mode='train', test_sess=5, duration=args.duration)
 dataloader_train = DataLoader(dataset_train, batch_size=args.batch_size, collate_fn=speech_collate, shuffle=True, drop_last=True, num_workers=14, pin_memory=True)  
 
-dataset_test = CustomDataset(args.raw_wav_path, mode='test', test_sess=5, duration=6)
+dataset_test = CustomDataset(args.raw_wav_path, mode='test', test_sess=5, duration=args.duration)
 dataloader_test = DataLoader(dataset_test, batch_size=args.batch_size, collate_fn=speech_collate, shuffle=False, drop_last=True, num_workers=14, pin_memory=True)  
 
 ## Model related
