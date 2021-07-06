@@ -13,7 +13,7 @@ from torch.utils.data import DataLoader
 
 from dataset import CustomDataset
 from utils.utils_wav import speech_collate
-from models.Emo_Raw_TDNN_StatPool import Emo_Raw_TDNN
+from models.Atten_Model import Atten_Model
 
 import os
 import argparse
@@ -157,7 +157,7 @@ def main(args):
     print('len of test set: ', len(test_set))
     test_loader = DataLoader(test_set, batch_size=args.batch_size, collate_fn=speech_collate, shuffle=False, drop_last=True, num_workers=14, pin_memory=True)
 
-    model = Emo_Raw_TDNN(args).to(device)
+    model = Atten_Model(args).to(device)
 
     # GPU / multi-GPU
     if args.multi_gpus and torch.cuda.device_count() > 1:
