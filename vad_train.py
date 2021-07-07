@@ -52,11 +52,7 @@ def train(train_loader,epoch, model, device, optimizer, criterion):
     train_loader = tqdm(train_loader)
     for step, (vad, labels) in enumerate(train_loader):
         #print(features.shape)
-        print('vad shape: ', vad.shape)
-        print('labels shape: ', labels.shape)
-        print(type(vad))
         labels = labels.reshape(-1).to(device)
-        print(type(labels))
         vad = vad.to(device)
         vad.requires_grad = True
         optimizer.zero_grad()
@@ -90,7 +86,7 @@ def test(test_loader,epoch, model, device, criterion):
         full_gts=[]
         for (vad, labels) in test_loader:
             vad = vad.to(device)
-            labels = labels.to(device)
+            labels = labels.reshape(-1).to(device)
             preds= model(vad)
             #### CE loss
             loss = criterion(preds,labels)
