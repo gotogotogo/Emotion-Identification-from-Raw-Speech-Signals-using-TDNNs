@@ -62,7 +62,6 @@ def train(train_loader,epoch, model, device, optimizer, criterion):
         loss.backward()
         optimizer.step()
         train_loss_list.append(loss.item())
-        #train_acc_list.append(accuracy)
         if step % 10 == 0:
             train_loader.desc = "[epoch {} step {}] mean loss {}".format(epoch, step, round(np.mean(np.asarray(train_loss_list)), 5))
         
@@ -123,7 +122,8 @@ def main(args):
 
     model = Vad_Classify().to(device)
     
-    optimizer = optim.Adam(model.parameters(), lr=args.lr, weight_decay=0.000001, betas=(0.9, 0.98), eps=1e-9)
+    # optimizer = optim.Adam(model.parameters(), lr=args.lr, weight_decay=0.000001, betas=(0.9, 0.98), eps=1e-9)
+    optimizer = optim.SGD(model.parameters(), lr=args.lr, momentum=0.9, weight_decay=0.000001)
     #loss_fun = nn.CrossEntropyLoss()
     criterion = nn.CrossEntropyLoss().to(device)
 
