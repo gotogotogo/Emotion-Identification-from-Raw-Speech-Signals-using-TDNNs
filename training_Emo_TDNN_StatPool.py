@@ -34,6 +34,7 @@ parser.add_argument('-num_epochs', type=int, default=1000)
 parser.add_argument('--raw_wav_path', type=str, default='raw_wavs.pkl')
 parser.add_argument('--lr', type=float, default=0.0001)
 parser.add_argument('--duration', type=float, default=8)
+parser.add_argument('--num_workers', type=int, default=8)
 args = parser.parse_args()
 
 class Cross_Entropy_Loss_Label_Smooth(nn.Module):
@@ -151,11 +152,11 @@ def main(args):
     
     train_set = CustomDataset(args.raw_wav_path, mode='train', test_sess=5, duration=args.duration)
     print('len of train set: ', len(train_set))
-    train_loader = DataLoader(train_set, batch_size=args.batch_size, collate_fn=speech_collate, shuffle=True, drop_last=True, num_workers=14, pin_memory=True)  
+    train_loader = DataLoader(train_set, batch_size=args.batch_size, collate_fn=speech_collate, shuffle=True, drop_last=True, num_workers=args.num_workers, pin_memory=False)  
 
     test_set = CustomDataset(args.raw_wav_path, mode='test', test_sess=5, duration=args.duration)
     print('len of test set: ', len(test_set))
-    test_loader = DataLoader(test_set, batch_size=args.batch_size, collate_fn=speech_collate, shuffle=False, drop_last=True, num_workers=14, pin_memory=True)
+    test_loader = DataLoader(test_set, batch_size=args.batch_size, collate_fn=speech_collate, shuffle=False, drop_last=True, num_workers=args.num_workers, pin_memory=False)
 
     model = Atten_Model(args).to(device)
 
