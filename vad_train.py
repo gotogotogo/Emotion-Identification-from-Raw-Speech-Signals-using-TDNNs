@@ -64,7 +64,7 @@ def train(train_loader,epoch, model, device, optimizer, criterion):
         train_loss_list.append(loss.item())
         #train_acc_list.append(accuracy)
         if step % 10 == 0:
-            train_loader.desc = "[epoch {} step {}] mean loss {}".format(epoch, step, np.mean(np.asarray(train_loss_list)))
+            train_loader.desc = "[epoch {} step {}] mean loss {}".format(epoch, step, round(np.mean(np.asarray(train_loss_list)), 5))
         
         predictions = np.argmax(preds.detach().cpu().numpy(),axis=1)
         for pred in predictions:
