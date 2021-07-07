@@ -23,7 +23,6 @@ from sklearn.metrics import balanced_accuracy_score, classification_report, conf
 
 import warnings
 warnings.filterwarnings('ignore')
-torch.multiprocessing.set_sharing_strategy('file_system')
 
 ########## Argument parser
 parser = argparse.ArgumentParser(add_help=False)
