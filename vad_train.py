@@ -55,8 +55,8 @@ def train(train_loader,epoch, model, device, optimizer, criterion):
         print('vad shape: ', vad.shape)
         print('labels shape: ', labels.shape)
         print(type(vad))
+        labels = labels.reshape(-1).to(device)
         print(type(labels))
-        labels = labels.to(device)
         vad = vad.to(device)
         vad.requires_grad = True
         optimizer.zero_grad()
