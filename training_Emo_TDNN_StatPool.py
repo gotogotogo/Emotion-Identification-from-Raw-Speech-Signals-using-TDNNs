@@ -13,7 +13,7 @@ from torch.utils.data import DataLoader
 
 from dataset import CustomDataset
 from utils.utils_wav import speech_collate
-from models.Atten_Model import Atten_Model
+from models.atten_model import Atten_Model
 
 import os
 import argparse
@@ -160,7 +160,7 @@ def main(args):
     model = Atten_Model(args).to(device)
 
     # GPU / multi-GPU
-    if args.multi_gpus and torch.cuda.device_count() > 1:
+    if torch.cuda.device_count() > 1:
         model = nn.DataParallel(model)
         model = model.to(device)
         print('DataParallel! Using', torch.cuda.device_count(), 'GPUs!')
