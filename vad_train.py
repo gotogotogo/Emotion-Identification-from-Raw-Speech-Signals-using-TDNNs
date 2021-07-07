@@ -125,7 +125,7 @@ def main(args):
     print('len of test set: ', len(test_set))
     test_loader = DataLoader(test_set, batch_size=args.batch_size, shuffle=False, drop_last=True, num_workers=8, pin_memory=False)
 
-    model = Vad_Classify(args).to(device)
+    model = Vad_Classify().to(device)
     
     optimizer = optim.Adam(model.parameters(), lr=args.lr, weight_decay=0.000001, betas=(0.9, 0.98), eps=1e-9)
     #loss_fun = nn.CrossEntropyLoss()
