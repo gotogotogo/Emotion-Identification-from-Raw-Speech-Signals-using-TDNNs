@@ -121,7 +121,7 @@ def main(args):
     print('len of train set: ', len(train_set))
     train_loader = DataLoader(train_set, batch_size=args.batch_size, shuffle=True, drop_last=True, num_workers=8, pin_memory=False)  
 
-    test_set = VadDataset(args.raw_wav_path, mode='test', test_sess=5, duration=args.duration)
+    test_set = VadDataset(args.raw_wav_path, mode='test', test_sess=5)
     print('len of test set: ', len(test_set))
     test_loader = DataLoader(test_set, batch_size=args.batch_size, shuffle=False, drop_last=True, num_workers=8, pin_memory=False)
 
