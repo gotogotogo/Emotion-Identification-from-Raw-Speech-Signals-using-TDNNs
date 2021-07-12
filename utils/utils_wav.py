@@ -57,3 +57,11 @@ def speech_collate(batch):
         duration.append(sample['duration'])
         vad.append(sample['vad'])
     return raw_data, targets, duration, vad
+
+def gender_speech_collate(batch):
+    raw_data = []
+    gender = []
+    for sample in batch:
+        raw_data.append(sample['waveform'])
+        gender.append(sample['gender'])
+    return raw_data, gender

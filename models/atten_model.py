@@ -137,5 +137,27 @@ class Atten_Model(nn.Module):
 
         return c_pred, d_pred
     
-    
-    
+
+class Gender_Classify(nn.Module):
+    def __init__(self, args):
+        super(Gender_Classify, self).__init__()
+        self.bn1 = nn.BatchNorm1d(args.duration * 16000) 
+        self.dense1 = nn.Linear(args.duration * 16000, 2400)
+        self.bn2 = nn.BatchNorm1d(2400)
+        self.dense2 = nn.Linear(2400, 1260)
+        self.bn3 = nn.BatchNorm1d(1260)
+        self.dense3 = nn.Linear(1260, 610)
+        self.dense4 = nn.Linear(2,2)
+
+    def forward(self, x):
+        out1 = self.dense1(self.bn1(x))
+
+        out2 = self.dense2(self.bn2(out1))
+
+        out3 = self.dense3(self.bn3(out2))
+
+        out_mean = torch.mean(out3, 1)
+        out_std = torch.var(out3, 1)
+        out4 = torch.cat((out_mean, out_std), 1)
+        out4 = self.dense4(out4)
+        return out4
