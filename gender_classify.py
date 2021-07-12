@@ -59,13 +59,11 @@ def train(train_loader,epoch, model, device, optimizer, criterion):
     model.train()
     train_loader = tqdm(train_loader)
     for step, (features, genders) in enumerate(train_loader):
-        print(features.shape)
-        print(type(features))
-        print(genders.shape)
-        print(type(genders))
+        # print(features.shape)
+        # print(genders.shape)
         # features = torch.from_numpy(np.asarray([torch_tensor.numpy() for torch_tensor in features])).float()         
         # genders = torch.from_numpy(np.asarray([torch_tensor[0].numpy() for torch_tensor in genders]))
-        features = features.float().to(device)
+        features = features.float().squeeze(1).to(device)
         features.requires_grad = True
         genders = genders.to(device)
         optimizer.zero_grad()
