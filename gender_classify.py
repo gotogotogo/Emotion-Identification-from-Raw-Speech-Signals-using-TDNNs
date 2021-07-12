@@ -103,7 +103,7 @@ def test(test_loader,epoch, model, device, criterion):
             #### CE loss
             loss = criterion(pred, genders)
             val_loss_list.append(loss.item())
-            predictions = np.argmax(c_pred.detach().cpu().numpy(),axis=1)
+            predictions = np.argmax(pred.detach().cpu().numpy(),axis=1)
             
             for pred in predictions:
                 full_preds.append(pred)
