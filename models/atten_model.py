@@ -160,6 +160,9 @@ class Gender_Classify(nn.Module):
 
         out_mean = torch.mean(out3, 1)
         out_std = torch.var(out3, 1)
+        print("mean shape ", out_mean.shape)
+        print("std shape ", out_std.shape)
         out4 = torch.cat((out_mean, out_std), -1)
+        print('out4 shape ', out4.shape)
         out4 = self.dense4(out4)
         return out4
