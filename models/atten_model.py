@@ -150,7 +150,7 @@ class Gender_Classify(nn.Module):
         self.dense4 = nn.Linear(2,2)
 
     def forward(self, x):
-        print('x shape: ', x.shape)
+        # print('x shape: ', x.shape)
         out1 = self.bn1(x)
         out1 = self.dense1(out1)
 
@@ -160,6 +160,6 @@ class Gender_Classify(nn.Module):
 
         out_mean = torch.mean(out3, 1)
         out_std = torch.var(out3, 1)
-        out4 = torch.cat((out_mean, out_std), 1)
+        out4 = torch.cat((out_mean, out_std), -1)
         out4 = self.dense4(out4)
         return out4
