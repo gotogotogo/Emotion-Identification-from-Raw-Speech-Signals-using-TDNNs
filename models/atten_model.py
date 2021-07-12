@@ -150,7 +150,9 @@ class Gender_Classify(nn.Module):
         self.dense4 = nn.Linear(2,2)
 
     def forward(self, x):
-        out1 = self.dense1(self.bn1(x))
+        print('x shape: ', x.shape)
+        out1 = self.bn1(x)
+        out1 = self.dense1(out1)
 
         out2 = self.dense2(self.bn2(out1))
 
