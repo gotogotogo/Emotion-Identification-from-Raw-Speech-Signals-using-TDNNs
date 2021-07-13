@@ -61,7 +61,8 @@ def train(train_loader,epoch, model, device, optimizer, criterion):
     for step, (features, genders) in enumerate(train_loader):
         features = torch.from_numpy(np.asarray([torch_tensor.numpy() for torch_tensor in features])).float()         
         genders = torch.from_numpy(np.asarray([torch_tensor[0].numpy() for torch_tensor in genders]))
-        features = features.squeeze(1).to(device)
+        print('features shape: ', features.shape)
+        features = features.to(device)
         features.requires_grad = True
         genders = genders.to(device)
         optimizer.zero_grad()
@@ -95,7 +96,7 @@ def test(test_loader,epoch, model, device, criterion):
         for (features, genders) in test_loader:
             features = torch.from_numpy(np.asarray([torch_tensor.numpy() for torch_tensor in features])).float()
             genders = torch.from_numpy(np.asarray([torch_tensor[0].numpy() for torch_tensor in genders]))
-            features = features.squeeze(1).to(device)
+            features = features.to(device)
 
             genders = genders.to(device)
             pred= model(features)
