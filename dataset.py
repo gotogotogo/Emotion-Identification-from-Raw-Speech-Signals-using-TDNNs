@@ -75,4 +75,4 @@ class GenderDataset(Dataset):
                 'gender': torch.from_numpy(np.ascontiguousarray(gender))
                 }
                 
-        return extend_wav, gender
+        return sample

@@ -59,10 +59,10 @@ def train(train_loader,epoch, model, device, optimizer, criterion):
     model.train()
     train_loader = tqdm(train_loader)
     for step, (features, genders) in enumerate(train_loader):
-        # print(features.shape)
-        # print(genders.shape)
-        # features = torch.from_numpy(np.asarray([torch_tensor.numpy() for torch_tensor in features])).float()         
-        genders = torch.from_numpy(np.asarray([torch_tensor.numpy() for torch_tensor in genders]))
+        features = torch.from_numpy(np.asarray([torch_tensor.numpy() for torch_tensor in features])).float()         
+        genders = torch.from_numpy(np.asarray([torch_tensor[0].numpy() for torch_tensor in genders]))
+        print(features.shape)
+        print(genders.shape)
         features = features.float().squeeze(1).to(device)
         features.requires_grad = True
         genders = genders.to(device)
@@ -127,14 +127,12 @@ def main(args):
     
     train_set = GenderDataset(args.raw_wav_path, mode='train', test_sess=5, duration=args.duration)
     print('len of train set: ', len(train_set))
-    #train_loader = DataLoader(train_set, batch_size=args.batch_size, collate_fn=gender_speech_collate, shuffle=True, drop_last=True, num_workers=args.num_workers, pin_memory=False)  
-    train_loader = DataLoader(train_set, batch_size=args.batch_size, shuffle=True, drop_last=True, num_workers=args.num_workers, pin_memory=False)  
+    train_loader = DataLoader(train_set, batch_size=args.batch_size, collate_fn=gender_speech_collate, shuffle=True, drop_last=True, num_workers=args.num_workers, pin_memory=False)  
 
 
     test_set = GenderDataset(args.raw_wav_path, mode='test', test_sess=5, duration=args.duration)
     print('len of test set: ', len(test_set))
-    #test_loader = DataLoader(test_set, batch_size=args.batch_size, collate_fn=gender_speech_collate, shuffle=False, drop_last=True, num_workers=args.num_workers, pin_memory=False)
-    test_loader = DataLoader(test_set, batch_size=args.batch_size, shuffle=False, drop_last=True, num_workers=args.num_workers, pin_memory=False)
+    test_loader = DataLoader(test_set, batch_size=args.batch_size, collate_fn=gender_speech_collate, shuffle=False, drop_last=True, num_workers=args.num_workers, pin_memory=False)
     
 
     model = Gender_Classify(args).to(device)
