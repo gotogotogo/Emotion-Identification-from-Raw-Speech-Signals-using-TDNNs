@@ -36,7 +36,7 @@ parser.add_argument('--num_workers', type=int, default=8)
 args = parser.parse_args()
 
 class Cross_Entropy_Loss_Label_Smooth(nn.Module):
-    def __init__(self, num_classes=4, epsilon=0.1):
+    def __init__(self, num_classes=2, epsilon=0.1):
         super(Cross_Entropy_Loss_Label_Smooth, self).__init__()
         self.num_classes = num_classes
         self.epsilon = epsilon
