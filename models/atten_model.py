@@ -156,25 +156,25 @@ class Gender_Classify(nn.Module):
 
 
     def forward(self, x):
-        print('x shape: ', x.shape)
+        # print('x shape: ', x.shape)
         out1 = self.bn1(x)
         out1 = F.relu(self.cnn1(out1))
         out1 = self.maxpool1(out1)
-        print('out1 shape: ', out1.shape)
+        # print('out1 shape: ', out1.shape)
 
         out2 = self.bn2(out1)
         out2 = F.relu(self.cnn2(out2))
         out2 = self.maxpool2(out2)
-        print('out2 shape: ', out2.shape)
+        # print('out2 shape: ', out2.shape)
 
         out3 = self.bn3(out2)
         out3 = F.relu(self.cnn3(out3))
         out3 = self.maxpool3(out3)
-        print('out3 shape: ', out3.shape)
+        # print('out3 shape: ', out3.shape)
 
         out_mean = torch.mean(out3, -1)
         # out_std = torch.var(out3, -1)
-        print("mean shape ", out_mean.shape)
+        # print("mean shape ", out_mean.shape)
         # print("std shape ", out_std.shape)
         
         # out4 = torch.cat((out_mean, out_std), -1)
