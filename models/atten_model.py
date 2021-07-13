@@ -141,28 +141,43 @@ class Atten_Model(nn.Module):
 class Gender_Classify(nn.Module):
     def __init__(self, args):
         super(Gender_Classify, self).__init__()
-        self.bn1 = nn.BatchNorm1d(args.duration * 16000) 
-        self.dense1 = nn.Linear(args.duration * 16000, 2400)
-        self.bn2 = nn.BatchNorm1d(2400)
-        self.dense2 = nn.Linear(2400, 1260)
-        self.bn3 = nn.BatchNorm1d(1260)
-        self.dense3 = nn.Linear(1260, 610)
-        self.dense4 = nn.Linear(2,2)
+        self.bn1 = nn.BatchNorm1d(1) 
+        self.cnn1 = nn.Conv1d(in_channels=1, out_channels=2, kernel_size=5, stride=5, padding=0)
+        self.maxpool1 = nn.MaxPool1d(kernel_size=2, stride=2)
+
+        self.bn2 = nn.BatchNorm1d(2) 
+        self.cnn2 = nn.Conv1d(in_channels=2, out_channels=2, kernel_size=3, stride=3, padding=0)
+        self.maxpool2 = nn.MaxPool1d(kernel_size=2, stride=2)
+
+        self.bn3 = nn.BatchNorm1d(2) 
+        self.cnn3 = nn.Conv1d(in_channels=2, out_channels=2, kernel_size=3, stride=1, padding=0)
+        self.maxpool3 = nn.MaxPool1d(kernel_size=2, stride=2)
+
+
 
     def forward(self, x):
-        # print('x shape: ', x.shape)
+        print('x shape: ', x.shape)
         out1 = self.bn1(x)
-        out1 = self.dense1(out1)
+        out1 = F.relu(self.cnn1(out1))
+        out1 = self.maxpool1(out1)
+        print('out1 shape: ', out1.shape)
 
-        out2 = self.dense2(self.bn2(out1))
+        out2 = self.bn2(out1)
+        out2 = F.relu(self.cnn2(out2))
+        out2 = self.maxpool2(out2)
+        print('out2 shape: ', out2.shape)
 
-        out3 = self.dense3(self.bn3(out2))
+        out3 = self.bn3(out2)
+        out3 = F.relu(self.cnn3(out3))
+        out3 = self.maxpool3(out3)
+        print('out3 shape: ', out3.shape)
 
-        out_mean = torch.mean(out3, 1).reshape(-1, 1)
-        out_std = torch.var(out3, 1).reshape(-1, 1)
-        # print("mean shape ", out_mean.shape)
-        # print("std shape ", out_std.shape)
+        out_mean = torch.mean(out3, 1)
+        out_std = torch.var(out3, 1)
+        print("mean shape ", out_mean.shape)
+        print("std shape ", out_std.shape)
+
         out4 = torch.cat((out_mean, out_std), 1)
-        # print('out4 shape ', out4.shape)
-        out4 = self.dense4(out4)
+        print('out4 shape ', out4.shape)
+        
         return out4
